@@ -59,17 +59,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.LineBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
 import ShapeTalk.Chat.Channel;
 import ShapeTalk.Chat.Manager;
+import ShapeTalk.DrawingBoard.ColorPane;
 import ShapeTalk.DrawingBoard.DrawingBoard;
 
-public class ShapeTalk implements WindowListener, ActionListener,
-		MouseListener, MouseMotionListener, ItemListener {
+public class ShapeTalk implements WindowListener, MouseListener,
+		MouseMotionListener, ItemListener {
 
 	public static boolean showPosition = false;
 
@@ -98,37 +98,14 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		createContents();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ActionListener#actionPerformed(ActionEvent)
-	 */
-	public void actionPerformed(ActionEvent ae) {
-		// TODO Auto-generated method stub
-		// if (ae.getActionCommand().equals("OK")) {
-		// if (colorToChange == changeStrokeColor) {
-		// strokeColorChooser.setForeground(colorChooser.getColor());
-		// strokeColor = colorChooser.getColor();
-		// colorToChange = -1;
-		// } else if (colorToChange == changeFillColor) {
-		// fillColorChooser.setBackground(colorChooser.getColor());
-		// fillColor = colorChooser.getColor();
-		// colorToChange = -1;
-		// }
-		// }
-		// if (ae.getActionCommand().equals("Cancel"))
-		// colorChooserDialog.dispose();
-	}
-
 	public void bgButtonActionPerformed(ActionEvent evt) {// GEN-
 		// FIRST
 		// :
 		// event_bgButtonActionPerformed
 		final Color color = JColorChooser.showDialog(bg_frame,
-				"Change Board Background Color", drawingBoard.getBackground());
+				"Change Fill Color", colorPane.getFillColor());
 		if (color != null) {
-			drawingBoard.setBackground(color);
-			bgButton.setBackground(color);
+			colorPane.setFillColor(color);
 		}
 	}// GEN-LAST:event_bgButtonActionPerformed
 
@@ -144,7 +121,8 @@ public class ShapeTalk implements WindowListener, ActionListener,
 			return;
 		}
 
-		if (ltChans.getSelectedValue() == null && !GetCreateNewChannel()) {
+		if (listChannelList.getSelectedValue() == null
+				&& !GetCreateNewChannel()) {
 			currentToolLabel.setForeground(Color.RED);
 			currentToolLabel
 					.setText("You must select a channel to join or create a new one");
@@ -173,7 +151,7 @@ public class ShapeTalk implements WindowListener, ActionListener,
 				currentToolLabel.setText("Channel already exists");
 			}
 		} else {
-			final String selChan = (String) ltChans.getSelectedValue();
+			final String selChan = (String) listChannelList.getSelectedValue();
 			try {
 				Channel.JoinExisting(selChan, GetSelChannelKey());
 
@@ -206,6 +184,42 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		drawingBoard.clearBoard();
 	}// GEN-LAST:event_clearButtonActionPerformed
 
+	public void create_drawingboard() {
+
+		drawingBoard = new DrawingBoard();
+		drawingBoard.setSize(new Dimension(1600, 1200));
+		drawingBoard.setDoubleBuffered(true);
+		drawingBoard.addMouseListener(this);
+		drawingBoard.addMouseMotionListener(this);
+
+		centerPane = new JScrollPane();
+		centerPane.setToolTipText("");
+		centerPane.setDoubleBuffered(true);
+		centerPane.setAutoscrolls(true);
+		centerPane.setViewportBorder(BorderFactory
+				.createBevelBorder(BevelBorder.LOWERED));
+		centerPane.setViewportView(drawingBoard);
+
+		bg_frame.getContentPane().add(centerPane, BorderLayout.CENTER);
+
+		fgButton.setBackground(drawingBoard.getForeground());
+		bgButton.setBackground(drawingBoard.getBackground());
+
+	}
+
+	public void createConfPane() {
+
+		confPanel = new JPanel();
+		confPanel.setMaximumSize(new Dimension(500, 900));
+		confPanel.setMinimumSize(new Dimension(0, 400));
+		confPanel.setPreferredSize(new Dimension(250, 600));
+		confPanel.setVisible(false);
+		bg_frame.getContentPane().add(confPanel, BorderLayout.EAST);
+		confPanel.setBorder(new TitledBorder(null, "Conference Panel",
+				TitledBorder.DEFAULT_JUSTIFICATION,
+				TitledBorder.DEFAULT_POSITION, null, null));
+	}
+
 	/**
 	 * Initialize the contents of the frame
 	 */
@@ -221,9 +235,15 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		bg_frame.setBounds(100, 100, 1043, 610);
 		bg_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		/**
-		 * create main menu
-		 */
+		createMenu();
+		createStatusbar();
+		createConfPane();
+		createToolPane();
+
+		create_drawingboard();
+	}
+
+	public void createMenu() {
 		mainMenu = new JMenuBar();
 		bg_frame.setJMenuBar(mainMenu);
 		{
@@ -300,6 +320,9 @@ public class ShapeTalk implements WindowListener, ActionListener,
 				helpMenuItem.add(aboutMenuItem);
 			}
 		}
+	}
+
+	public void createStatusbar() {
 		statusBar = new JPanel();
 		final FlowLayout flowLayout = new FlowLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
@@ -318,29 +341,16 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		mousePositionLabel.setPreferredSize(new Dimension(150, 17));
 		mousePositionLabel.setText("");
 		statusBar.add(mousePositionLabel);
-
-		confPanel = new JPanel();
-		confPanel.setMaximumSize(new Dimension(500, 900));
-		confPanel.setMinimumSize(new Dimension(0, 400));
-		confPanel.setPreferredSize(new Dimension(250, 600));
-		confPanel.setVisible(false);
-		bg_frame.getContentPane().add(confPanel, BorderLayout.EAST);
-		confPanel.setBorder(new TitledBorder(null, "Conference Panel",
-				TitledBorder.DEFAULT_JUSTIFICATION,
-				TitledBorder.DEFAULT_POSITION, null, null));
-
-		create_drawingboard();
 	}
 
-	public void create_drawingboard() {
-
+	public void createToolPane() {
 		toolsGroup = new ButtonGroup();
 
 		ctrlPanel = new JPanel();
 		bg_frame.getContentPane().add(ctrlPanel, BorderLayout.WEST);
-		mediumPanel1 = new JPanel();
+		toolSettingsPane = new JPanel();
 		toolsPanel = new JPanel();
-		mediumPanel2 = new JPanel();
+		toolButtonsPane = new JPanel();
 		lineButton = new JToggleButton();
 		rectButton = new JToggleButton();
 		ovalButton = new JToggleButton();
@@ -350,225 +360,212 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		textButton = new JToggleButton();
 		clearButton = new JButton();
 		colorPanel = new JPanel();
+		colorPanel.setLayout(new BorderLayout());
 		fgButton = new JButton();
+		fgButton.setName("fgButton");
 		bgButton = new JButton();
+		bgButton.setName("bgButton");
 		strokeSettingsPanel = new JPanel();
-		mediumPanel3 = new JPanel();
+		strokeSettingsPane = new JPanel();
 		weightCombo = new JComboBox();
 		eraserCombo = new JComboBox();
-		dbSettingsPanel = new JPanel();
-		mediumPanel4 = new JPanel();
+		fontSettingsPane = new JPanel();
 
 		ctrlPanel.setLayout(new GridBagLayout());
 
 		ctrlPanel.setBorder(new SoftBevelBorder(BevelBorder.RAISED));
-		mediumPanel1.setLayout(new BoxLayout(mediumPanel1, BoxLayout.Y_AXIS));
+		toolSettingsPane.setLayout(new BoxLayout(toolSettingsPane,
+				BoxLayout.Y_AXIS));
+		{
+			toolsPanel.setBorder(new TitledBorder("Tools"));
+			toolButtonsPane.setLayout(new GridLayout(4, 2, 5, 5));
 
-		toolsPanel.setBorder(new TitledBorder("Tools"));
-		mediumPanel2.setLayout(new GridLayout(4, 2, 5, 5));
+			toolsGroup.add(lineButton);
+			lineButton.setFont(new Font("Dialog", 0, 10));
+			lineButton.setSelected(true);
+			currentToolLabel.setForeground(Color.BLACK);
+			currentToolLabel.setText("Drag to draw lines.");
+			lineButton.setText("Line");
+			lineButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Drag to draw lines.");
+					lineButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(lineButton);
-		lineButton.setFont(new Font("Dialog", 0, 10));
-		lineButton.setSelected(true);
-		currentToolLabel.setForeground(Color.BLACK);
-		currentToolLabel.setText("Drag to draw lines.");
-		lineButton.setText("Line");
-		lineButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw lines.");
-				lineButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(lineButton);
 
-		mediumPanel2.add(lineButton);
+			toolsGroup.add(rectButton);
+			rectButton.setFont(new Font("Dialog", 0, 10));
+			rectButton.setText("Rect");
+			rectButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Drag to draw rectangles.");
+					rectButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(rectButton);
-		rectButton.setFont(new Font("Dialog", 0, 10));
-		rectButton.setText("Rect");
-		rectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw rectangles.");
-				rectButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(rectButton);
 
-		mediumPanel2.add(rectButton);
+			toolsGroup.add(ovalButton);
+			ovalButton.setFont(new Font("Dialog", 0, 10));
+			ovalButton.setText("Oval");
+			ovalButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Drag to draw ovals.");
+					ovalButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(ovalButton);
-		ovalButton.setFont(new Font("Dialog", 0, 10));
-		ovalButton.setText("Oval");
-		ovalButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw ovals.");
-				ovalButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(ovalButton);
 
-		mediumPanel2.add(ovalButton);
+			toolsGroup.add(diamondButton);
+			diamondButton.setFont(new Font("Dialog", 0, 10));
+			diamondButton.setText("Diamond");
+			diamondButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Drag to draw diamonds.");
+					diamondButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(diamondButton);
-		diamondButton.setFont(new Font("Dialog", 0, 10));
-		diamondButton.setText("Diamond");
-		diamondButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw diamonds.");
-				diamondButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(diamondButton);
 
-		mediumPanel2.add(diamondButton);
+			toolsGroup.add(pencilButton);
+			pencilButton.setFont(new Font("Dialog", 0, 10));
+			pencilButton.setText("Pencil");
+			pencilButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Drag to draw freely.");
+					pencilButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(pencilButton);
-		pencilButton.setFont(new Font("Dialog", 0, 10));
-		pencilButton.setText("Pencil");
-		pencilButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw freely.");
-				pencilButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(pencilButton);
 
-		mediumPanel2.add(pencilButton);
+			toolsGroup.add(eraserButton);
+			eraserButton.setFont(new Font("Dialog", 0, 10));
+			eraserButton.setText("Eraser");
+			eraserButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Drag to erase.");
+					eraserButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(eraserButton);
-		eraserButton.setFont(new Font("Dialog", 0, 10));
-		eraserButton.setText("Eraser");
-		eraserButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to erase.");
-				eraserButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(eraserButton);
 
-		mediumPanel2.add(eraserButton);
+			toolsGroup.add(textButton);
+			textButton.setFont(new Font("Dialog", 0, 10));
+			textButton.setText("Text");
+			textButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					currentToolLabel.setForeground(Color.BLACK);
+					currentToolLabel.setText("Click to draw text.");
+					textButtonActionPerformed(evt);
+				}
+			});
 
-		toolsGroup.add(textButton);
-		textButton.setFont(new Font("Dialog", 0, 10));
-		textButton.setText("Text");
-		textButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Click to draw text.");
-				textButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(textButton);
 
-		mediumPanel2.add(textButton);
+			clearButton.setFont(new Font("Dialog", 1, 10));
+			clearButton.setText("Clear");
+			clearButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					clearButtonActionPerformed(evt);
+				}
+			});
 
-		clearButton.setFont(new Font("Dialog", 1, 10));
-		clearButton.setText("Clear");
-		clearButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				clearButtonActionPerformed(evt);
-			}
-		});
+			toolButtonsPane.add(clearButton);
 
-		mediumPanel2.add(clearButton);
+			toolsPanel.add(toolButtonsPane);
 
-		toolsPanel.add(mediumPanel2);
+			toolSettingsPane.add(toolsPanel);
+		}
+		{
+			colorPanel.setBorder(new TitledBorder("Color Settings"));
+			final JPanel colorPanelLeft = new JPanel();
+			colorPanelLeft.setLayout(new FlowLayout());
+			colorPanel.add("West", colorPanelLeft);
+			colorPane = new ColorPane();
+			colorPane.setName("colorPane");
+			colorPanelLeft.add(colorPane);
 
-		mediumPanel1.add(toolsPanel);
+			final JPanel colorPanelRight = new JPanel();
+			colorPanelRight.setLayout(new BorderLayout());
+			colorPanel.add("East", colorPanelRight);
+			fgButton.setText("Set Stroke Color");
+			fgButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					fgButtonActionPerformed(evt);
+				}
+			});
+			colorPanelRight.add(fgButton);
 
-		colorPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
+			bgButton.setText("Set Fill Color");
+			bgButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					bgButtonActionPerformed(evt);
+				}
+			});
+			colorPanelRight.add(bgButton, BorderLayout.SOUTH);
 
-		colorPanel.setBorder(new TitledBorder("Color Settings"));
-		fgButton.setToolTipText("Change Drawing Color");
-		fgButton.setBorder(new LineBorder(new Color(0, 0, 0)));
-		fgButton.setPreferredSize(new Dimension(50, 50));
-		fgButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				fgButtonActionPerformed(evt);
-			}
-		});
+			toolSettingsPane.add(colorPanel);
+		}
+		{
+			strokeSettingsPanel.setBorder(new TitledBorder("Stroke Setttings"));
+			strokeSettingsPane.setLayout(new BorderLayout(0, 3));
 
-		colorPanel.add(fgButton);
-		bgButton.setToolTipText("Change Board Background Color");
-		bgButton.setBorder(new LineBorder(new Color(0, 0, 0)));
-		bgButton.setPreferredSize(new Dimension(50, 50));
-		bgButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				bgButtonActionPerformed(evt);
-			}
-		});
+			weightCombo.setFont(new Font("Dialog", 0, 10));
+			weightCombo.setModel(new DefaultComboBoxModel(new String[] {
+					"Stroke Weight 1.0px", "Stroke Weight 2.0px",
+					"Stroke Weight 5.0px", "Stroke Weight 7.5px",
+					"Stroke Weight 10.0px" }));
+			weightCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					weightComboActionPerformed(evt);
+				}
+			});
 
-		colorPanel.add(bgButton);
+			strokeSettingsPane.add(weightCombo, BorderLayout.NORTH);
 
-		mediumPanel1.add(colorPanel);
+			eraserCombo.setFont(new Font("Dialog", 0, 10));
+			eraserCombo.setModel(new DefaultComboBoxModel(new String[] {
+					"Eraser Size 15px", "Eraser Size 20px", "Eraser Size 30px",
+					"Eraser Size 50px", "Eraser Size 100px" }));
+			eraserCombo.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evt) {
+					eraserComboActionPerformed(evt);
+				}
+			});
 
-		strokeSettingsPanel.setBorder(new TitledBorder("Stroke Setttings"));
-		mediumPanel3.setLayout(new BorderLayout(0, 3));
+			strokeSettingsPane.add(eraserCombo, BorderLayout.SOUTH);
 
-		weightCombo.setFont(new Font("Dialog", 0, 10));
-		weightCombo.setModel(new DefaultComboBoxModel(new String[] {
-				"Stroke Weight 1.0px", "Stroke Weight 2.0px",
-				"Stroke Weight 5.0px", "Stroke Weight 7.5px",
-				"Stroke Weight 10.0px" }));
-		weightCombo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				weightComboActionPerformed(evt);
-			}
-		});
+			strokeSettingsPanel.add(strokeSettingsPane);
 
-		mediumPanel3.add(weightCombo, BorderLayout.NORTH);
+			toolSettingsPane.add(strokeSettingsPanel);
+		}
+		{
+			fontSettingsPane.setBorder(new TitledBorder("Font Settings"));
 
-		eraserCombo.setFont(new Font("Dialog", 0, 10));
-		eraserCombo.setModel(new DefaultComboBoxModel(new String[] {
-				"Eraser Size 15px", "Eraser Size 20px", "Eraser Size 30px",
-				"Eraser Size 50px", "Eraser Size 100px" }));
-		eraserCombo.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				eraserComboActionPerformed(evt);
-			}
-		});
+			toolSettingsPane.add(fontSettingsPane);
 
-		mediumPanel3.add(eraserCombo, BorderLayout.SOUTH);
-
-		strokeSettingsPanel.add(mediumPanel3);
-
-		mediumPanel1.add(strokeSettingsPanel);
-
-		dbSettingsPanel.setBorder(new TitledBorder("Drawing Board Settings"));
-		mediumPanel4.setLayout(new BorderLayout(0, 3));
-
-		dbSettingsPanel.add(mediumPanel4);
-
-		mediumPanel1.add(dbSettingsPanel);
-
-		final JButton changeCanvasSize = new JButton();
-		changeCanvasSize.setText("Change canvas size");
-		dbSettingsPanel.add(changeCanvasSize);
+			final JButton changeFont = new JButton();
+			changeFont.setText("Change Font");
+			fontSettingsPane.add(changeFont);
+		}
 
 		final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.NORTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new Insets(10, 5, 5, 5);
-		ctrlPanel.add(mediumPanel1, gridBagConstraints);
-
-		drawingBoard = new DrawingBoard();
-		drawingBoard.setSize(new Dimension(1600, 1200));
-		drawingBoard.setDoubleBuffered(true);
-		drawingBoard.addMouseListener(this);
-		drawingBoard.addMouseMotionListener(this);
-
-		centerPane = new JScrollPane();
-		centerPane.setToolTipText("");
-		centerPane.setDoubleBuffered(true);
-		centerPane.setAutoscrolls(true);
-		centerPane.setViewportBorder(BorderFactory
-				.createBevelBorder(BevelBorder.LOWERED));
-		centerPane.setViewportView(drawingBoard);
-
-		bg_frame.getContentPane().add(centerPane, BorderLayout.CENTER);
-
-		fgButton.setBackground(drawingBoard.getForeground());
-		bgButton.setBackground(drawingBoard.getBackground());
-
+		ctrlPanel.add(toolSettingsPane, gridBagConstraints);
 	}
 
 	public void diamondButtonActionPerformed(ActionEvent evt) {// GEN
@@ -600,125 +597,125 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		// :
 		// event_fgButtonActionPerformed
 		final Color color = JColorChooser.showDialog(bg_frame,
-				"Change Drawing Color", drawingBoard.getForeground());
+				"Change Stroke Color", colorPane.getStrokeColor());
 		if (color != null) {
 			drawingBoard.setForeground(color);
-			fgButton.setBackground(color);
+			colorPane.setStrokeColor(color);
 		}
 	}// GEN-LAST:event_fgButtonActionPerformed
 
 	public boolean GetCreateNewChannel() {
-		return tbNewChan.getText().length() > 0;
+		return textFieldNewChannelName.getText().length() > 0;
 	}
 
 	public String GetNewChannelKey() {
 
-		return tbKey.getText();
+		return textFieldInputKey.getText();
 	}
 
 	public String GetNewChannelName() {
-		return tbNewChan.getText();
+		return textFieldNewChannelName.getText();
 	}
 
 	public String GetNick() {
-		return tbNickname.getText();
+		return textFieldNickname.getText();
 	}
 
 	public String GetSelChannelKey() {
-		return tbSelKey.getText();
+		return textFieldSetKey.getText();
 	}
 
 	public void initConfPaneComponents() {
-		tbNickname = new JTextField();
-		tbNewChan = new JTextField();
-		tbKey = new JTextField();
-		tbSelKey = new JTextField();
-		jLabel1 = new JLabel();
-		jLabel2 = new JLabel();
-		jScrollPane1 = new JScrollPane();
-		ltChans = new JList();
-		jLabel3 = new JLabel();
-		jLabel4 = new JLabel();
-		jLabel5 = new JLabel();
-		btOK = new JButton();
-		jButton1 = new JButton();
-		jLabel7 = new JLabel();
+		textFieldNickname = new JTextField();
+		textFieldNewChannelName = new JTextField();
+		textFieldInputKey = new JTextField();
+		textFieldSetKey = new JTextField();
+		labelNickName = new JLabel();
+		labelJoinChannel = new JLabel();
+		scrollPaneChannelList = new JScrollPane();
+		listChannelList = new JList();
+		labelCreateChannel = new JLabel();
+		labelName = new JLabel();
+		labelInputKey = new JLabel();
+		buttonOK = new JButton();
+		labelUpdateList = new JButton();
+		labelSetKey = new JLabel();
 
 		confPanel.setLayout(null);
 
-		confPanel.add(tbNickname);
-		tbNickname.setBounds(100, 20, 120, 20);
+		confPanel.add(textFieldNickname);
+		textFieldNickname.setBounds(100, 20, 120, 20);
 
-		jLabel1.setFont(new Font("Arial", 0, 12));
-		jLabel1.setText("Nickname:");
-		confPanel.add(jLabel1);
-		jLabel1.setBounds(10, 20, 90, 20);
+		labelNickName.setFont(new Font("Arial", 0, 12));
+		labelNickName.setText("Nickname:");
+		confPanel.add(labelNickName);
+		labelNickName.setBounds(10, 20, 90, 20);
 
-		jLabel2.setFont(new Font("Tahoma", 1, 11));
-		jLabel2.setText("Join a channel...");
-		confPanel.add(jLabel2);
-		jLabel2.setBounds(10, 60, 89, 14);
+		labelJoinChannel.setFont(new Font("Tahoma", 1, 11));
+		labelJoinChannel.setText("Join a channel...");
+		confPanel.add(labelJoinChannel);
+		labelJoinChannel.setBounds(10, 60, 89, 14);
 
-		jScrollPane1.setViewportView(ltChans);
+		scrollPaneChannelList.setViewportView(listChannelList);
 
-		confPanel.add(jScrollPane1);
-		jScrollPane1.setBounds(20, 80, 220, 110);
+		confPanel.add(scrollPaneChannelList);
+		scrollPaneChannelList.setBounds(20, 80, 220, 110);
 
-		jLabel3.setFont(new Font("Tahoma", 1, 11));
-		jLabel3.setText("... Or create a new channel");
-		confPanel.add(jLabel3);
-		jLabel3.setBounds(10, 230, 200, 14);
+		labelCreateChannel.setFont(new Font("Tahoma", 1, 11));
+		labelCreateChannel.setText("... Or create a new channel");
+		confPanel.add(labelCreateChannel);
+		labelCreateChannel.setBounds(10, 230, 200, 14);
 
-		jLabel4.setFont(new Font("Arial", 0, 12));
-		jLabel4.setText("Name:");
-		confPanel.add(jLabel4);
-		jLabel4.setBounds(10, 250, 60, 20);
+		labelName.setFont(new Font("Arial", 0, 12));
+		labelName.setText("Name:");
+		confPanel.add(labelName);
+		labelName.setBounds(10, 250, 60, 20);
 
-		tbNewChan.addKeyListener(new KeyAdapter() {
+		textFieldNewChannelName.addKeyListener(new KeyAdapter() {
 			public void keyTyped(KeyEvent evt) {
 				tbNewChanKeyTyped(evt);
 			}
 		});
 
-		confPanel.add(tbNewChan);
-		tbNewChan.setBounds(80, 250, 70, 20);
+		confPanel.add(textFieldNewChannelName);
+		textFieldNewChannelName.setBounds(80, 250, 70, 20);
 
-		jLabel5.setFont(new Font("Arial", 0, 12));
-		jLabel5.setText("Key:");
-		confPanel.add(jLabel5);
-		jLabel5.setBounds(172, 250, 40, 20);
+		labelInputKey.setFont(new Font("Arial", 0, 12));
+		labelInputKey.setText("Key:");
+		confPanel.add(labelInputKey);
+		labelInputKey.setBounds(172, 250, 40, 20);
 
-		tbKey.setEnabled(false);
-		confPanel.add(tbKey);
-		tbKey.setBounds(210, 250, 40, 20);
+		textFieldInputKey.setEnabled(false);
+		confPanel.add(textFieldInputKey);
+		textFieldInputKey.setBounds(210, 250, 40, 20);
 
-		btOK.setText("OK");
-		btOK.addActionListener(new ActionListener() {
+		buttonOK.setText("OK");
+		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				btOKActionPerformed(evt);
 			}
 		});
 
-		confPanel.add(btOK);
-		btOK.setBounds(10, 280, 220, 23);
+		confPanel.add(buttonOK);
+		buttonOK.setBounds(10, 280, 220, 23);
 
-		jButton1.setText("Update List");
-		jButton1.addActionListener(new ActionListener() {
+		labelUpdateList.setText("Update List");
+		labelUpdateList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				jButton1ActionPerformed(evt);
 			}
 		});
 
-		confPanel.add(jButton1);
-		jButton1.setBounds(120, 60, 119, 20);
+		confPanel.add(labelUpdateList);
+		labelUpdateList.setBounds(120, 60, 119, 20);
 
-		confPanel.add(tbSelKey);
-		tbSelKey.setBounds(170, 200, 80, 20);
+		confPanel.add(textFieldSetKey);
+		textFieldSetKey.setBounds(170, 200, 80, 20);
 
-		jLabel7.setFont(new Font("Arial", 0, 12));
-		jLabel7.setText("Join using key:");
-		confPanel.add(jLabel7);
-		jLabel7.setBounds(50, 200, 100, 20);
+		labelSetKey.setFont(new Font("Arial", 0, 12));
+		labelSetKey.setText("Join using key:");
+		confPanel.add(labelSetKey);
+		labelSetKey.setBounds(50, 200, 100, 20);
 
 	}
 
@@ -955,7 +952,8 @@ public class ShapeTalk implements WindowListener, ActionListener,
 
 	public void tbNewChanKeyTyped(KeyEvent evt) {// GEN-FIRST:
 		// event_tbNewChanKeyTyped
-		tbKey.setEnabled(tbNewChan.getText().length() > 0);
+		textFieldInputKey
+				.setEnabled(textFieldNewChannelName.getText().length() > 0);
 	}// GEN-LAST:event_tbNewChanKeyTyped
 
 	public void textButtonActionPerformed(ActionEvent evt) {// GEN
@@ -963,11 +961,11 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		// FIRST
 		// :
 		// event_textButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_text);
+		drawingBoard.setTool(DrawingBoard.TOOL_TEXT);
 	}// GEN-LAST:event_textButtonActionPerformed
 
 	public void UpdateChanList() {
-		ltChans.setModel(new AbstractListModel() {
+		listChannelList.setModel(new AbstractListModel() {
 			public Object getElementAt(int i) {
 				return strings[i];
 			}
@@ -1062,11 +1060,13 @@ public class ShapeTalk implements WindowListener, ActionListener,
 	public JFrame bg_frame;
 	public JButton bgButton;
 	// Variables declaration - do not modify//GEN-BEGIN:variables
-	public JButton btOK;
+	public JButton buttonOK;
 	public JScrollPane centerPane;
 	public JButton clearButton;
 	public JColorChooser colorChooser;
 	public JDialog colorChooserDialog;
+	public ColorPane colorPane;
+
 	public JPanel colorPanel;
 
 	public JMenu conferenceMenu;
@@ -1074,8 +1074,6 @@ public class ShapeTalk implements WindowListener, ActionListener,
 	public JPanel confPanel;
 
 	public JPanel ctrlPanel;
-
-	public JPanel dbSettingsPanel;
 
 	public JToggleButton diamondButton;
 
@@ -1091,37 +1089,27 @@ public class ShapeTalk implements WindowListener, ActionListener,
 
 	public JMenu fileMenu;
 
-	public Color fillColor;
+	public JPanel fontSettingsPane;
 
-	public JButton jButton1;
+	public JLabel labelCreateChannel;
 
-	public JLabel jLabel1;
+	public JLabel labelInputKey;
 
-	public JLabel jLabel2;
+	public JLabel labelJoinChannel;
 
-	public JLabel jLabel3;
+	public JLabel labelName;
 
-	public JLabel jLabel4;
+	public JLabel labelNickName;
 
-	public JLabel jLabel5;
+	public JLabel labelSetKey;
 
-	public JLabel jLabel7;
-
-	public JScrollPane jScrollPane1;
+	public JButton labelUpdateList;
 
 	public JToggleButton lineButton;
 
-	public JList ltChans;
+	public JList listChannelList;
 
 	public JMenuBar mainMenu;
-
-	public JPanel mediumPanel1;
-
-	public JPanel mediumPanel2;
-
-	public JPanel mediumPanel3;
-
-	public JPanel mediumPanel4;
 
 	public JLabel mousePositionLabel, currentToolLabel;
 
@@ -1147,6 +1135,8 @@ public class ShapeTalk implements WindowListener, ActionListener,
 
 	public JToggleButton rectButton;
 
+	public JScrollPane scrollPaneChannelList;
+
 	public FileFilter shapeTalkDrawFilter = new FileFilter() {
 		@Override
 		public boolean accept(java.io.File f) {
@@ -1165,23 +1155,26 @@ public class ShapeTalk implements WindowListener, ActionListener,
 
 	public JPanel statusBar;
 
-	public Color strokeColor = Color.BLACK;
+	public JPanel strokeSettingsPane;
 
 	public JPanel strokeSettingsPanel;
 
-	public JTextField tbKey;
-
-	public JTextField tbNewChan;
-
-	public JTextField tbNickname;
-
-	public JTextField tbSelKey;
-
 	public JToggleButton textButton;
+
+	public JTextField textFieldInputKey;
+
+	public JTextField textFieldNewChannelName;
+
+	public JTextField textFieldNickname;
+
+	public JTextField textFieldSetKey;
+
+	public JPanel toolButtonsPane;
+
+	public JPanel toolSettingsPane;
 
 	public ButtonGroup toolsGroup;
 
 	public JPanel toolsPanel;
-
 	public JComboBox weightCombo;
 }

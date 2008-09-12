@@ -33,7 +33,7 @@ public class DrawingBoard extends JPanel implements MouseListener,
 
 	public static final int TOOL_RECT = 1;
 
-	public static final int TOOL_text = 6;
+	public static final int TOOL_TEXT = 6;
 
 	public DrawingBoard() {
 		shapes = new ArrayList();
@@ -116,7 +116,7 @@ public class DrawingBoard extends JPanel implements MouseListener,
 						DrawingBoard.ERASER_STROKES[eraserIndex], e.getX(), e
 								.getY());
 				break;
-			case TOOL_text:
+			case TOOL_TEXT:
 				currentShape = new Text(getForeground(),
 						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
 				break;
@@ -178,14 +178,14 @@ public class DrawingBoard extends JPanel implements MouseListener,
 	}
 
 	public void setStrokeIndex(int i) {
-		if (i < 0 || i > 4) {
-			throw new IllegalArgumentException("Invaild Weight Specified!");
-		}
+		// if (i < 0 || i > 4) {
+		// throw new IllegalArgumentException("Invaild Weight Specified!");
+		// }
 		strokeIndex = i;
 	}
 
 	public void setTool(int t) {
-		if (t < DrawingBoard.TOOL_LINE || t > DrawingBoard.TOOL_text) {
+		if (t < DrawingBoard.TOOL_LINE || t > DrawingBoard.TOOL_TEXT) {
 			throw new IllegalArgumentException("Invaild Tool Specified!");
 		}
 		tool = t;
