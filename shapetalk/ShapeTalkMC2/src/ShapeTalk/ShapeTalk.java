@@ -319,6 +319,21 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		mousePositionLabel.setText("");
 		statusBar.add(mousePositionLabel);
 
+		confPanel = new JPanel();
+		confPanel.setMaximumSize(new Dimension(500, 900));
+		confPanel.setMinimumSize(new Dimension(0, 400));
+		confPanel.setPreferredSize(new Dimension(250, 600));
+		confPanel.setVisible(false);
+		bg_frame.getContentPane().add(confPanel, BorderLayout.EAST);
+		confPanel.setBorder(new TitledBorder(null, "Conference Panel",
+				TitledBorder.DEFAULT_JUSTIFICATION,
+				TitledBorder.DEFAULT_POSITION, null, null));
+
+		create_drawingboard();
+	}
+
+	public void create_drawingboard() {
+
 		toolsGroup = new ButtonGroup();
 
 		ctrlPanel = new JPanel();
@@ -554,15 +569,6 @@ public class ShapeTalk implements WindowListener, ActionListener,
 		fgButton.setBackground(drawingBoard.getForeground());
 		bgButton.setBackground(drawingBoard.getBackground());
 
-		confPanel = new JPanel();
-		confPanel.setMaximumSize(new Dimension(500, 900));
-		confPanel.setMinimumSize(new Dimension(0, 400));
-		confPanel.setPreferredSize(new Dimension(250, 600));
-		confPanel.setVisible(false);
-		bg_frame.getContentPane().add(confPanel, BorderLayout.EAST);
-		confPanel.setBorder(new TitledBorder(null, "Conference Panel",
-				TitledBorder.DEFAULT_JUSTIFICATION,
-				TitledBorder.DEFAULT_POSITION, null, null));
 	}
 
 	public void diamondButtonActionPerformed(ActionEvent evt) {// GEN
