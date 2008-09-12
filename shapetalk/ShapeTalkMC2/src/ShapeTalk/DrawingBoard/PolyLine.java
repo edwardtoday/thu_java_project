@@ -1,9 +1,9 @@
 package ShapeTalk.DrawingBoard;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 
 public class PolyLine extends FreeShape {
 
@@ -11,7 +11,7 @@ public class PolyLine extends FreeShape {
 		super();
 	}
 
-	public PolyLine(Color c, Stroke s, int x, int y) {
+	public PolyLine(Color c, BasicStroke s, int x, int y) {
 		super(c, s, x, y);
 	}
 

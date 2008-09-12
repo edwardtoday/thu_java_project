@@ -1,9 +1,9 @@
 package ShapeTalk.DrawingBoard;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
 public class Text implements IShape {
@@ -12,7 +12,7 @@ public class Text implements IShape {
 		pointsSet = new PointsSet();
 	}
 
-	public Text(Color c, Stroke s, int x, int y) {
+	public Text(Color c, BasicStroke s, int x, int y) {
 		this();
 		color = c;
 		stroke = s;
@@ -39,13 +39,7 @@ public class Text implements IShape {
 	}
 
 	public String getShapeData() {
-		int si = 0;
-		for (int i = 0; i < DrawingBoard.STROKES.length; i++) {
-			if (stroke == DrawingBoard.STROKES[i]) {
-				si = i;
-				break;
-			}
-		}
+		float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
@@ -74,7 +68,7 @@ public class Text implements IShape {
 	public void setShapeData(String data) throws Exception {
 		final String splits[] = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
-		stroke = DrawingBoard.STROKES[Integer.parseInt(splits[1])];
+		stroke = new BasicStroke(Float.parseFloat(splits[1]));
 		for (int i = 2; i < splits.length; i += 2) {
 			pointsSet.addPoint(Integer.parseInt(splits[i]), Integer
 					.parseInt(splits[i + 1]));
@@ -90,6 +84,6 @@ public class Text implements IShape {
 
 	private final PointsSet pointsSet;
 
-	private Stroke stroke;
+	private BasicStroke stroke;
 
 }

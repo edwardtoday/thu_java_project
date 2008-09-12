@@ -1,9 +1,9 @@
 package ShapeTalk.DrawingBoard;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 
 public class Rect extends RectBoundedShape {
 
@@ -11,8 +11,8 @@ public class Rect extends RectBoundedShape {
 		super();
 	}
 
-	public Rect(Color c, Stroke s, int x, int y) {
-		super(c, s, x, y);
+	public Rect(Color c, BasicStroke s, int x, int y, int f) {
+		super(c, s, x, y, f);
 	}
 
 	public void draw(Graphics2D g) {
@@ -35,7 +35,11 @@ public class Rect extends RectBoundedShape {
 			y = startY;
 			h = endY - startY;
 		}
-		g.drawRect(x, y, w, h);
+		if (filled == 0)
+			g.drawRect(x, y, w, h);
+		else
+			g.fillRect(x, y, w, h);
+
 	}
 
 }

@@ -1,9 +1,9 @@
 package ShapeTalk.DrawingBoard;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
 public class Line extends RectBoundedShape {
@@ -12,8 +12,8 @@ public class Line extends RectBoundedShape {
 		super();
 	}
 
-	public Line(Color c, Stroke s, int x, int y) {
-		super(c, s, x, y);
+	public Line(Color c,BasicStroke s, int x, int y, int f) {
+		super(c, s, x, y, f);
 	}
 
 	public void draw(Graphics2D g) {

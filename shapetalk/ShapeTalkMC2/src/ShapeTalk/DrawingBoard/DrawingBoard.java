@@ -3,6 +3,7 @@ package ShapeTalk.DrawingBoard;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -30,10 +31,10 @@ public class DrawingBoard extends JPanel implements MouseListener,
 	public static final int TOOL_LINE = 0;
 	public static final int TOOL_OVAL = 2;
 	public static final int TOOL_PENCIL = 4;
-
 	public static final int TOOL_RECT = 1;
-
 	public static final int TOOL_TEXT = 6;
+	public static final int TOOL_ROUNDRECT = 7;
+	public static final int TOOL_SELE = 8;
 
 	public DrawingBoard() {
 		shapes = new ArrayList();
@@ -90,26 +91,37 @@ public class DrawingBoard extends JPanel implements MouseListener,
 
 	public void mousePressed(MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
+			if (fill == 0)
+				this.setForeground(strokeColor);
+			else
+				this.setForeground(fillColor);
+
 			switch (tool) {
 			case TOOL_LINE:
+				this.setForeground(strokeColor);
 				currentShape = new Line(getForeground(),
-						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
+						new BasicStroke(strokeIndex), e.getX(), e.getY(),
+						fill);
 				break;
 			case TOOL_RECT:
 				currentShape = new Rect(getForeground(),
-						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
+						new BasicStroke(strokeIndex), e.getX(), e.getY(),
+						fill);
 				break;
 			case TOOL_OVAL:
 				currentShape = new Oval(getForeground(),
-						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
+						new BasicStroke(strokeIndex), e.getX(), e.getY(),
+						fill);
 				break;
 			case TOOL_DIAMOND:
 				currentShape = new Diamond(getForeground(),
-						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
+						new BasicStroke(strokeIndex), e.getX(), e.getY(),
+						fill);
 				break;
 			case TOOL_PENCIL:
+				this.setForeground(strokeColor);
 				currentShape = new PolyLine(getForeground(),
-						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
+						new BasicStroke(strokeIndex), e.getX(), e.getY());
 				break;
 			case TOOL_ERASER:
 				currentShape = new Eraser(this,
@@ -118,7 +130,15 @@ public class DrawingBoard extends JPanel implements MouseListener,
 				break;
 			case TOOL_TEXT:
 				currentShape = new Text(getForeground(),
-						DrawingBoard.STROKES[strokeIndex], e.getX(), e.getY());
+						new BasicStroke(strokeIndex), e.getX(), e.getY());
+				break;
+			case TOOL_ROUNDRECT:
+				currentShape = new RoundRect(getForeground(),
+						new BasicStroke(strokeIndex), e.getX(), e.getY(),
+						fill);
+				break;
+			case TOOL_SELE:
+
 				break;
 			}
 			shapes.add(currentShape);
@@ -154,6 +174,8 @@ public class DrawingBoard extends JPanel implements MouseListener,
 					shape = new Line();
 				} else if (split2[0].equals("ShapeTalk.DrawingBoard.Rect")) {
 					shape = new Rect();
+				} else if (split2[0].equals("ShapeTalk.DrawingBoard.RoundRect")) {
+					shape = new RoundRect();
 				} else if (split2[0].equals("ShapeTalk.DrawingBoard.Oval")) {
 					shape = new Oval();
 				} else if (split2[0].equals("ShapeTalk.DrawingBoard.Diamond")) {
@@ -185,7 +207,7 @@ public class DrawingBoard extends JPanel implements MouseListener,
 	}
 
 	public void setTool(int t) {
-		if (t < DrawingBoard.TOOL_LINE || t > DrawingBoard.TOOL_TEXT) {
+		if (t < DrawingBoard.TOOL_LINE || t > DrawingBoard.TOOL_SELE) {
 			throw new IllegalArgumentException("Invaild Tool Specified!");
 		}
 		tool = t;
@@ -203,12 +225,43 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		}
 	}
 
+	public Font getFont() {
+		return font;
+	}
+
+	public void setFont(Font f) {
+		if (f != null)
+			font = f;
+	}
+
+	public int getFill() {
+		return fill;
+	}
+
+	public void setFill(boolean f) {
+		fill = f ? 1 : 0;
+	}
+
+	public void setStrokeColor(Color c) {
+		if (c != null)
+			strokeColor = c;
+	}
+
+	public void setFillColor(Color c) {
+		if (c != null)
+			fillColor = c;
+	}
+
 	private IShape currentShape;
 
 	private ArrayList shapes;
 
-	private int strokeIndex, eraserIndex;
+	private static int strokeIndex, eraserIndex;
 
-	private int tool;
+	private static Font font = new Font("Arial", Font.PLAIN, 18);
+	private static String string2draw = "set your own string";
 
+	private static int tool;
+	private static int fill = 0;
+	private static Color strokeColor = Color.BLACK, fillColor = Color.WHITE;
 }

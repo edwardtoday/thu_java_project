@@ -1,5 +1,6 @@
 package ShapeTalk.DrawingBoard;
 
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
@@ -44,6 +45,7 @@ public class Eraser extends FreeShape {
 				break;
 			}
 		}
+		// float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(si);
 		final int[][] ps = pointsSet.getPoints();
@@ -59,7 +61,7 @@ public class Eraser extends FreeShape {
 	@Override
 	public void setShapeData(String data) throws Exception {
 		final String splits[] = data.split(":");
-		stroke = DrawingBoard.ERASER_STROKES[Integer.parseInt(splits[0])];
+		stroke = new BasicStroke(Float.parseFloat(splits[0]));
 		for (int i = 1; i < splits.length; i += 2) {
 			pointsSet.addPoint(Integer.parseInt(splits[i]), Integer
 					.parseInt(splits[i + 1]));

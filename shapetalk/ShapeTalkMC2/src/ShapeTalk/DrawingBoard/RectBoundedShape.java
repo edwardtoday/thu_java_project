@@ -1,7 +1,7 @@
 package ShapeTalk.DrawingBoard;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
 public abstract class RectBoundedShape implements IShape {
@@ -9,21 +9,23 @@ public abstract class RectBoundedShape implements IShape {
 	protected RectBoundedShape() {
 	}
 
-	protected RectBoundedShape(Color c, Stroke s, int x, int y) {
+	protected RectBoundedShape(Color c, BasicStroke s, int x, int y, int f) {
 		color = c;
 		stroke = s;
 		startX = endX = x;
 		startY = endY = y;
+		filled = f;
 	}
 
 	public String getShapeData() {
-		int si = 0;
-		for (int i = 0; i < DrawingBoard.STROKES.length; i++) {
-			if (stroke == DrawingBoard.STROKES[i]) {
-				si = i;
-				break;
-			}
-		}
+//		int si = 0;
+//		for (int i = 0; i < DrawingBoard.STROKES.length; i++) {
+//			if (stroke == DrawingBoard.STROKES[i]) {
+//				si = i;
+//				break;
+//			}
+//		}
+		float si=stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
@@ -36,6 +38,8 @@ public abstract class RectBoundedShape implements IShape {
 		buffer.append(endX);
 		buffer.append(":");
 		buffer.append(endY);
+		buffer.append(":");
+		buffer.append(filled);
 		return buffer.toString();
 	}
 
@@ -55,11 +59,12 @@ public abstract class RectBoundedShape implements IShape {
 	public void setShapeData(String data) throws Exception {
 		final String[] splits = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
-		stroke = DrawingBoard.STROKES[Integer.parseInt(splits[1])];
+		stroke = new BasicStroke(Float.parseFloat(splits[1]));
 		startX = Integer.parseInt(splits[2]);
 		startY = Integer.parseInt(splits[3]);
 		endX = Integer.parseInt(splits[4]);
 		endY = Integer.parseInt(splits[5]);
+		filled = Integer.parseInt(splits[6]);
 	}
 
 	/**
@@ -83,6 +88,8 @@ public abstract class RectBoundedShape implements IShape {
 
 	protected int startX, startY, endX, endY;
 
-	protected Stroke stroke;
+	protected BasicStroke stroke;
+
+	protected int filled;
 
 }

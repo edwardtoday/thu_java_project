@@ -4,6 +4,8 @@
 package ShapeTalk.TsPaint;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.*;
 
 /**
@@ -176,6 +178,10 @@ public class TsPaint {
 		menuConfig=new JMenu("设置(C)");
 		menuConfig.setMnemonic('C');
 		mnuC_SetSize=new JMenuItem("画布大小(C)",toolbarPanel.imgs[7]);
+		mnuC_SetSize.addActionListener(new ActionListener() {
+			public void actionPerformed(final ActionEvent e) {
+			}
+		});
 		mnuC_SetSize.setMnemonic('C');
 		mnuC_SetSize.setActionCommand("SetCanvas");
 		mnuC_BackColor=new JMenuItem("背景色(B)",toolbarPanel.imgs[8]);
