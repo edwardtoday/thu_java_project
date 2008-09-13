@@ -2,6 +2,7 @@ package ShapeTalk.DrawingBoard;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
@@ -9,81 +10,64 @@ import java.awt.event.MouseEvent;
 public class Text implements IShape {
 
 	public Text() {
-		pointsSet = new PointsSet();
 	}
 
-	public Text(Color c, BasicStroke s, int x, int y) {
+	public Text(String s, Color c, int x, int y, Font f) {
 		this();
+		string = s;
 		color = c;
-		stroke = s;
-		pointsSet.addPoint(x, y);
-		currX = x;
-		currY = y;
-		finalized = false;
+		X = x;
+		Y = y;
+		font = f;
 	}
 
 	public void draw(Graphics2D g) {
 		g.setColor(color);
-		g.setStroke(stroke);
-		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
-		if (finalized) { // draw a close text
-			final int[][] points = pointsSet.getPoints();
-			if (points == null)
-				return;
-			g.drawPolygon(points[0], points[1], points[0].length);
-		} else { // don't draw a closed text
-			final int[][] points = pointsSet.getPoints(currX, currY);
-			g.drawPolyline(points[0], points[1], points[0].length);
-		}
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.setFont(font);
+		g.drawString(string, X, Y);
 	}
 
 	public String getShapeData() {
-		float si = stroke.getLineWidth();
+		String si =string;
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
 		buffer.append(si);
-		final int[][] ps = pointsSet.getPoints();
-		for (int i = 0; i < ps[0].length; i++) {
-			buffer.append(":");
-			buffer.append(ps[0][i]);
-			buffer.append(":");
-			buffer.append(ps[1][i]);
-		}
+		buffer.append(":");
+		buffer.append(X);
+		buffer.append(":");
+		buffer.append(Y);
+		buffer.append(":");
+		buffer.append(font.getFontName());
+		buffer.append(":");
+		buffer.append(font.getStyle());
+		buffer.append(":");
+		buffer.append(font.getSize());
 		return buffer.toString();
 	}
 
 	public void processCursorEvent(MouseEvent e, int t) {
-		currX = e.getX();
-		currY = e.getY();
-		if (t == IShape.RIGHT_PRESSED) {
-			pointsSet.addPoint(currX, currY);
-		} else if (t == IShape.LEFT_RELEASED) {
-			finalized = true;
-			pointsSet.addPoint(currX, currY);
-		}
+		X = e.getX();
+		Y = e.getY();
 	}
 
 	public void setShapeData(String data) throws Exception {
 		final String splits[] = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
-		stroke = new BasicStroke(Float.parseFloat(splits[1]));
-		for (int i = 2; i < splits.length; i += 2) {
-			pointsSet.addPoint(Integer.parseInt(splits[i]), Integer
-					.parseInt(splits[i + 1]));
-		}
-		finalized = true;
+		string=splits[1];
+		X=Integer.parseInt(splits[2]);
+		Y=Integer.parseInt(splits[3]);
+		font=new Font(splits[4],Integer.parseInt(splits[5]),Integer.parseInt(splits[6]));
 	}
+
+	private String string;
 
 	private Color color;
 
-	private int currX, currY;
+	private int X, Y;
 
-	private boolean finalized;
-
-	private final PointsSet pointsSet;
-
-	private BasicStroke stroke;
+	private Font font;
 
 }

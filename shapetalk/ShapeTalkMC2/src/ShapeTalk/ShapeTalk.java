@@ -61,7 +61,6 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.EtchedBorder;
 import javax.swing.border.SoftBevelBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -72,6 +71,7 @@ import ShapeTalk.Chat.Channel;
 import ShapeTalk.Chat.Manager;
 import ShapeTalk.DrawingBoard.ColorPane;
 import ShapeTalk.DrawingBoard.DrawingBoard;
+import ShapeTalk.DrawingBoard.NwFontChooserS;
 
 public class ShapeTalk implements WindowListener, MouseListener,
 		MouseMotionListener, ItemListener {
@@ -183,6 +183,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	}// GEN-LAST:event_btOKActionPerformed
 
 	public void changeFontButtonActionPerformed() {
+		Font font = drawingBoard.getFont();
+		font = NwFontChooserS.showDialog(bg_frame, null, font);
+		drawingBoard.setFont(font);
 
 	}
 
@@ -666,6 +669,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// event_eraserComboActionPerformed
 		drawingBoard.setEraserIndex(eraserCombo.getSelectedIndex());
 	}// GEN-LAST:event_eraserComboActionPerformed
+
 	// public void eraserSliderStateChanged(ChangeEvent evt) {// GEN
 	// // -
 	// // FIRST

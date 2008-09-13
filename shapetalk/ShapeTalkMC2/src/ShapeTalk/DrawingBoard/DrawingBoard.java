@@ -99,29 +99,25 @@ public class DrawingBoard extends JPanel implements MouseListener,
 			switch (tool) {
 			case TOOL_LINE:
 				this.setForeground(strokeColor);
-				currentShape = new Line(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY(),
-						fill);
+				currentShape = new Line(getForeground(), new BasicStroke(
+						strokeIndex), e.getX(), e.getY(), fill);
 				break;
 			case TOOL_RECT:
-				currentShape = new Rect(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY(),
-						fill);
+				currentShape = new Rect(getForeground(), new BasicStroke(
+						strokeIndex), e.getX(), e.getY(), fill);
 				break;
 			case TOOL_OVAL:
-				currentShape = new Oval(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY(),
-						fill);
+				currentShape = new Oval(getForeground(), new BasicStroke(
+						strokeIndex), e.getX(), e.getY(), fill);
 				break;
 			case TOOL_DIAMOND:
-				currentShape = new Diamond(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY(),
-						fill);
+				currentShape = new Diamond(getForeground(), new BasicStroke(
+						strokeIndex), e.getX(), e.getY(), fill);
 				break;
 			case TOOL_PENCIL:
 				this.setForeground(strokeColor);
-				currentShape = new PolyLine(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY());
+				currentShape = new PolyLine(getForeground(), new BasicStroke(
+						strokeIndex), e.getX(), e.getY());
 				break;
 			case TOOL_ERASER:
 				currentShape = new Eraser(this,
@@ -129,13 +125,12 @@ public class DrawingBoard extends JPanel implements MouseListener,
 								.getY());
 				break;
 			case TOOL_TEXT:
-				currentShape = new Text(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY());
+				currentShape = new Text(string2draw, getForeground(), e.getX(),
+						e.getY(), font);
 				break;
 			case TOOL_ROUNDRECT:
-				currentShape = new RoundRect(getForeground(),
-						new BasicStroke(strokeIndex), e.getX(), e.getY(),
-						fill);
+				currentShape = new RoundRect(getForeground(), new BasicStroke(
+						strokeIndex), e.getX(), e.getY(), fill);
 				break;
 			case TOOL_SELE:
 
