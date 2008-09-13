@@ -47,10 +47,11 @@ public class Diamond extends RectBoundedShape {
 		yS[2] = y + h;
 		xS[3] = x;
 		yS[3] = y + h / 2;
-		if (this.filled == 0)
+		if (filled == 0) {
 			g.drawPolygon(xS, yS, 4);
-		else
+		} else {
 			g.fillPolygon(xS, yS, 4);
+		}
 	}
 
 	private final int[] xS;

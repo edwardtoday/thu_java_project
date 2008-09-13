@@ -33,7 +33,7 @@ public abstract class FreeShape implements IShape {
 				break;
 			}
 		}
-//		float si=stroke.getLineWidth();
+		// float si=stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");

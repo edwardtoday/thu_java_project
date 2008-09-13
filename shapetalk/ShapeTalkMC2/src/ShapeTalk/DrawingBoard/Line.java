@@ -12,7 +12,7 @@ public class Line extends RectBoundedShape {
 		super();
 	}
 
-	public Line(Color c,BasicStroke s, int x, int y, int f) {
+	public Line(Color c, BasicStroke s, int x, int y, int f) {
 		super(c, s, x, y, f);
 	}
 

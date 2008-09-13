@@ -1,6 +1,5 @@
 package ShapeTalk.DrawingBoard;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -30,7 +29,7 @@ public class Text implements IShape {
 	}
 
 	public String getShapeData() {
-		String si =string;
+		final String si = string;
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
@@ -56,18 +55,19 @@ public class Text implements IShape {
 	public void setShapeData(String data) throws Exception {
 		final String splits[] = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
-		string=splits[1];
-		X=Integer.parseInt(splits[2]);
-		Y=Integer.parseInt(splits[3]);
-		font=new Font(splits[4],Integer.parseInt(splits[5]),Integer.parseInt(splits[6]));
+		string = splits[1];
+		X = Integer.parseInt(splits[2]);
+		Y = Integer.parseInt(splits[3]);
+		font = new Font(splits[4], Integer.parseInt(splits[5]), Integer
+				.parseInt(splits[6]));
 	}
-
-	private String string;
 
 	private Color color;
 
-	private int X, Y;
-
 	private Font font;
+
+	private String string;
+
+	private int X, Y;
 
 }

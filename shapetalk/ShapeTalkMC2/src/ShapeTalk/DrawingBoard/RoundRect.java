@@ -35,10 +35,11 @@ public class RoundRect extends RectBoundedShape {
 			y = startY;
 			h = endY - startY;
 		}
-		if (filled == 0)
-			g.drawRoundRect(x, y, w, h, (int) (w / 5), (int) (h / 5));
-		else
-			g.fillRoundRect(x, y, w, h, (int) (w / 5), (int) (h / 5));
+		if (filled == 0) {
+			g.drawRoundRect(x, y, w, h, (w / 5), (h / 5));
+		} else {
+			g.fillRoundRect(x, y, w, h, (w / 5), (h / 5));
+		}
 	}
 
 }

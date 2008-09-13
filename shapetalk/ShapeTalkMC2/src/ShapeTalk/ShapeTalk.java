@@ -8,7 +8,6 @@ package ShapeTalk;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
@@ -72,20 +71,14 @@ import javax.swing.filechooser.FileFilter;
 import ShapeTalk.Chat.Channel;
 import ShapeTalk.Chat.Manager;
 import ShapeTalk.DrawingBoard.ColorPane;
-import ShapeTalk.DrawingBoard.Diamond;
 import ShapeTalk.DrawingBoard.DrawingBoard;
-import ShapeTalk.DrawingBoard.Eraser;
 import ShapeTalk.DrawingBoard.IShape;
-import ShapeTalk.DrawingBoard.Line;
 import ShapeTalk.DrawingBoard.NwFontChooserS;
-import ShapeTalk.DrawingBoard.Oval;
-import ShapeTalk.DrawingBoard.PolyLine;
-import ShapeTalk.DrawingBoard.Rect;
-import ShapeTalk.DrawingBoard.RoundRect;
-import ShapeTalk.DrawingBoard.Text;
 
 public class ShapeTalk implements WindowListener, MouseListener,
 		MouseMotionListener, ItemListener {
+
+	public static DrawingBoard drawingBoard;
 
 	public static boolean showPosition = false;
 
@@ -122,7 +115,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				"Change Fill Color", colorPane.getFillColor());
 		if (color != null) {
 			colorPane.setFillColor(color);
-			drawingBoard.setFillColor(color);
+			ShapeTalk.drawingBoard.setFillColor(color);
 		}
 	}// GEN-LAST:event_bgButtonActionPerformed
 
@@ -194,14 +187,14 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	}// GEN-LAST:event_btOKActionPerformed
 
 	public void changeFontButtonActionPerformed() {
-		Font font = drawingBoard.getFont();
+		Font font = ShapeTalk.drawingBoard.getFont();
 		font = NwFontChooserS.showDialog(bg_frame, null, font);
-		drawingBoard.setFont(font);
+		ShapeTalk.drawingBoard.setFont(font);
 		string2draw.setFont(font);
 	}
 
 	public void checkBoxFillStateChanged(ItemEvent e) {
-		drawingBoard.setFill(checkBoxFill.isSelected());
+		ShapeTalk.drawingBoard.setFill(checkBoxFill.isSelected());
 	}
 
 	public void clearButtonActionPerformed(ActionEvent evt) {// GEN
@@ -209,16 +202,16 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_clearButtonActionPerformed
-		drawingBoard.clearBoard();
+		ShapeTalk.drawingBoard.clearBoard();
 	}// GEN-LAST:event_clearButtonActionPerformed
 
 	public void create_drawingboard() {
 
-		drawingBoard = new DrawingBoard();
-		drawingBoard.setSize(new Dimension(1600, 1200));
-		drawingBoard.setDoubleBuffered(true);
-		drawingBoard.addMouseListener(this);
-		drawingBoard.addMouseMotionListener(this);
+		ShapeTalk.drawingBoard = new DrawingBoard();
+		ShapeTalk.drawingBoard.setSize(new Dimension(1600, 1200));
+		ShapeTalk.drawingBoard.setDoubleBuffered(true);
+		ShapeTalk.drawingBoard.addMouseListener(this);
+		ShapeTalk.drawingBoard.addMouseMotionListener(this);
 
 		centerPane = new JScrollPane();
 		centerPane.setToolTipText("");
@@ -226,7 +219,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		centerPane.setAutoscrolls(true);
 		centerPane.setViewportBorder(BorderFactory
 				.createBevelBorder(BevelBorder.LOWERED));
-		centerPane.setViewportView(drawingBoard);
+		centerPane.setViewportView(ShapeTalk.drawingBoard);
 
 		bg_frame.getContentPane().add(centerPane, BorderLayout.CENTER);
 
@@ -257,7 +250,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		bg_frame.setTitle("Shape Talk");
 		bg_frame.getContentPane().setFocusCycleRoot(true);
 		bg_frame.getContentPane().setLayout(new BorderLayout());
-		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();// 得到屏幕的大小
+		final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();// 得到屏幕的大小
 		final int MARGIN = 30;
 		bg_frame.setBounds((int) (MARGIN / 2), (int) (MARGIN / 2),
 				(int) ((screen.getWidth() - MARGIN)), (int) ((screen
@@ -357,7 +350,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				final JMenuItem startConfMenuItem = new JMenuItem();
 				startConfMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
-						startConfMenuItem.setEnabled(false);
+						// startConfMenuItem.setEnabled(false);
 						startConf();
 					}
 				});
@@ -371,28 +364,16 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			mainMenu.add(helpMenuItem);
 			{
 				// About
-				final JMenuItem aboutMenuItem = new JMenuItem();
-				aboutMenuItem.setText("About");
-				helpMenuItem.add(aboutMenuItem);
+				final JMenuItem viewDocMenuItem = new JMenuItem();
+				viewDocMenuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(final ActionEvent e) {
+						new AboutDialog(bg_frame);
+						return;
+					}
+				});
+				viewDocMenuItem.setText("View Doc");
+				helpMenuItem.add(viewDocMenuItem);
 			}
-		}
-	}
-
-	public void undoMenuItemActionPerformed() {
-		if (drawingBoard.shapes.size() > 0) {
-			drawingBoard.redos.add(drawingBoard.shapes.get(drawingBoard.shapes
-					.size() - 1));
-			drawingBoard.shapes.remove(drawingBoard.shapes.size() - 1);
-			drawingBoard.repaint();
-		}
-	}
-
-	public void redoMenuItemActionPerformed() {
-		if (drawingBoard.redos.size() > 0) {
-			drawingBoard.shapes.add(drawingBoard.shapes.get(drawingBoard.redos
-					.size() - 1));
-			drawingBoard.redos.remove(drawingBoard.redos.size() - 1);
-			drawingBoard.repaint();
 		}
 	}
 
@@ -703,8 +684,8 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				public void actionPerformed(final ActionEvent e) {
 					int index = shapesComboBox.getSelectedIndex();
 					index = 0;
-					drawingBoard.shapes.remove(index);
-					drawingBoard.repaint();
+					ShapeTalk.drawingBoard.shapes.remove(index);
+					ShapeTalk.drawingBoard.repaint();
 				}
 			});
 			deleteShapeButton.setText("Delete");
@@ -771,7 +752,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_diamondButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_DIAMOND);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_DIAMOND);
 	}// GEN-LAST:event_diamondButtonActionPerformed
 
 	public void eraserButtonActionPerformed(ActionEvent evt) {// GEN
@@ -779,7 +760,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_eraserButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_ERASER);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_ERASER);
 	}// GEN-LAST:event_eraserButtonActionPerformed
 
 	public void eraserComboActionPerformed(ActionEvent evt) {// GEN
@@ -787,7 +768,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_eraserComboActionPerformed
-		drawingBoard.setEraserIndex(eraserCombo.getSelectedIndex());
+		ShapeTalk.drawingBoard.setEraserIndex(eraserCombo.getSelectedIndex());
 	}// GEN-LAST:event_eraserComboActionPerformed
 
 	public void fgButtonActionPerformed(ActionEvent evt) {// GEN-
@@ -797,7 +778,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		final Color color = JColorChooser.showDialog(bg_frame,
 				"Change Stroke Color", colorPane.getStrokeColor());
 		if (color != null) {
-			drawingBoard.setStrokeColor(color);
+			ShapeTalk.drawingBoard.setStrokeColor(color);
 			colorPane.setStrokeColor(color);
 		}
 	}// GEN-LAST:event_fgButtonActionPerformed
@@ -815,6 +796,10 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		return textFieldNewChannelName.getText();
 	}
 
+	public String GetNick() {
+		return textFieldNickname.getText();
+	}
+
 	// public void eraserSliderStateChanged(ChangeEvent evt) {// GEN
 	// // -
 	// // FIRST
@@ -822,10 +807,6 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	// // event_eraserComboActionPerformed
 	// drawingBoard.setEraserIndex(eraserSlider.getValue());
 	// }// GEN-LAST:event_eraserComboActionPerformed
-
-	public String GetNick() {
-		return textFieldNickname.getText();
-	}
 
 	public String GetSelChannelKey() {
 		return textFieldSetKey.getText();
@@ -940,7 +921,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_lineButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_LINE);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_LINE);
 	}// GEN-LAST:event_lineButtonActionPerformed
 
 	public void loadImageMenuItemActionPerformed(ActionEvent evt) {// GEN
@@ -962,11 +943,11 @@ public class ShapeTalk implements WindowListener, MouseListener,
 					filechooser1.getSelectedFile()));
 			int rgb = Integer.parseInt(br.readLine());
 			final Color fgcolor = new Color(rgb);
-			drawingBoard.setForeground(fgcolor);
+			ShapeTalk.drawingBoard.setForeground(fgcolor);
 			fgButton.setBackground(fgcolor);
 			rgb = Integer.parseInt(br.readLine());
 			final Color bgcolor = new Color(rgb);
-			drawingBoard.setBackground(bgcolor);
+			ShapeTalk.drawingBoard.setBackground(bgcolor);
 			bgButton.setBackground(bgcolor);
 			// weightCombo.setSelectedIndex(Integer.parseInt(br.readLine()));
 			weightSlider.setValue(Integer.parseInt(br.readLine()));
@@ -977,7 +958,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			while ((str = br.readLine()) != null) {
 				list.add(str);
 			}
-			drawingBoard.setShapes(list);
+			ShapeTalk.drawingBoard.setShapes(list);
 		} catch (final Exception e) {
 			JOptionPane.showMessageDialog(bg_frame, e, "Error!",
 					JOptionPane.ERROR_MESSAGE);
@@ -1012,7 +993,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	 * @see MouseListener#mouseEntered(MouseEvent)
 	 */
 	public void mouseEntered(MouseEvent e) {
-		if (e.getSource().equals(drawingBoard)) {
+		if (e.getSource().equals(ShapeTalk.drawingBoard)) {
 			ShapeTalk.showPosition = true;
 		}
 	}
@@ -1023,7 +1004,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	 * @see MouseListener#mouseExited(MouseEvent)
 	 */
 	public void mouseExited(MouseEvent e) {
-		if (e.getSource().equals(drawingBoard)) {
+		if (e.getSource().equals(ShapeTalk.drawingBoard)) {
 			ShapeTalk.showPosition = false;
 			mousePositionLabel.setText("X=" + " Y=");
 		}
@@ -1054,15 +1035,23 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		updateShapesComboBox();
 	}
 
-	// End of variables declaration//GEN-END:variables
-
 	public void ovalButtonActionPerformed(ActionEvent evt) {// GEN
 		// -
 		// FIRST
 		// :
 		// event_ovalButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_OVAL);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_OVAL);
 	}// GEN-LAST:event_ovalButtonActionPerformed
+
+	// End of variables declaration//GEN-END:variables
+
+	public void pencilButtonActionPerformed(ActionEvent evt) {// GEN
+		// -
+		// FIRST
+		// :
+		// event_pencilButtonActionPerformed
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_PENCIL);
+	}// GEN-LAST:event_pencilButtonActionPerformed
 
 	/*
 	 * (non-Javadoc)
@@ -1070,28 +1059,30 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	 * @see MouseMotionListener#mouseMoved(MouseEvent)
 	 */
 
-	public void pencilButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_pencilButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_PENCIL);
-	}// GEN-LAST:event_pencilButtonActionPerformed
-
 	public void rectButtonActionPerformed(ActionEvent evt) {// GEN
 		// -
 		// FIRST
 		// :
 		// event_rectButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_RECT);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_RECT);
 	}// GEN-LAST:event_rectButtonActionPerformed
+
+	public void redoMenuItemActionPerformed() {
+		if (ShapeTalk.drawingBoard.redos.size() > 0) {
+			ShapeTalk.drawingBoard.shapes.add(ShapeTalk.drawingBoard.shapes
+					.get(ShapeTalk.drawingBoard.redos.size() - 1));
+			ShapeTalk.drawingBoard.redos.remove(ShapeTalk.drawingBoard.redos
+					.size() - 1);
+			ShapeTalk.drawingBoard.repaint();
+		}
+	}
 
 	public void roundrectButtonActionPerformed(ActionEvent evt) {// GEN
 		// -
 		// FIRST
 		// :
 		// event_rectButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_ROUNDRECT);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_ROUNDRECT);
 	}// GEN-LAST:event_rectButtonActionPerformed
 
 	public void saveAsPNGMenuItemActionPerformed(ActionEvent evt) {// GEN
@@ -1113,11 +1104,11 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			if (!file.getName().toLowerCase().endsWith(".png")) {
 				file = new File(file.getAbsolutePath() + ".png");
 			}
-			final Dimension d = drawingBoard.getSize();
+			final Dimension d = ShapeTalk.drawingBoard.getSize();
 			final BufferedImage image = new BufferedImage(d.width, d.height,
 					BufferedImage.TYPE_INT_ARGB);
 			final Graphics2D g = image.createGraphics();
-			drawingBoard.paint(g);
+			ShapeTalk.drawingBoard.paint(g);
 			g.dispose();
 			ImageIO.write(image, "png", file);
 		} catch (final Exception e) {
@@ -1145,8 +1136,8 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			if (!file.getName().toLowerCase().endsWith(".jdw")) {
 				file = new File(file.getAbsolutePath() + ".jdw");
 			}
-			final Color fgcolor = drawingBoard.getForeground();
-			final Color bgcolor = drawingBoard.getBackground();
+			final Color fgcolor = ShapeTalk.drawingBoard.getForeground();
+			final Color bgcolor = ShapeTalk.drawingBoard.getBackground();
 			final PrintWriter pw = new PrintWriter(new FileWriter(file));
 			pw.println(fgcolor.getRGB());
 			pw.println(bgcolor.getRGB());
@@ -1154,7 +1145,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			pw.println(weightSlider.getValue());
 			pw.print(eraserCombo.getSelectedIndex());
 			// pw.println(eraserSlider.getValue());
-			pw.print(drawingBoard.getShapes());
+			pw.print(ShapeTalk.drawingBoard.getShapes());
 			pw.close();
 		} catch (final java.io.IOException ioe) {
 			JOptionPane.showMessageDialog(bg_frame, ioe, "Error!",
@@ -1167,7 +1158,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_lineButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_SELE);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_SELE);
 	}// GEN-LAST:event_lineButtonActionPerformed
 
 	public void startConf() {
@@ -1178,7 +1169,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	}
 
 	public void string2drawChanged(ActionEvent e) {
-		drawingBoard.setString(string2draw.getText());
+		ShapeTalk.drawingBoard.setString(string2draw.getText());
 	}
 
 	public void tbNewChanKeyTyped(KeyEvent evt) {// GEN-FIRST:
@@ -1192,8 +1183,18 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// FIRST
 		// :
 		// event_textButtonActionPerformed
-		drawingBoard.setTool(DrawingBoard.TOOL_TEXT);
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_TEXT);
 	}// GEN-LAST:event_textButtonActionPerformed
+
+	public void undoMenuItemActionPerformed() {
+		if (ShapeTalk.drawingBoard.shapes.size() > 0) {
+			ShapeTalk.drawingBoard.redos.add(ShapeTalk.drawingBoard.shapes
+					.get(ShapeTalk.drawingBoard.shapes.size() - 1));
+			ShapeTalk.drawingBoard.shapes.remove(ShapeTalk.drawingBoard.shapes
+					.size() - 1);
+			ShapeTalk.drawingBoard.repaint();
+		}
+	}
 
 	public void UpdateChanList() {
 		listChannelList.setModel(new AbstractListModel() {
@@ -1211,19 +1212,19 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	}
 
 	public void updateShapesComboBox() {
-		String[] shapes = new String[drawingBoard.shapes.size()];
+		String[] shapes = new String[ShapeTalk.drawingBoard.shapes.size()];
 		int index = 0;
 		// save temp file
 		try {
-			final Color fgcolor = drawingBoard.getForeground();
-			final Color bgcolor = drawingBoard.getBackground();
+			final Color fgcolor = ShapeTalk.drawingBoard.getForeground();
+			final Color bgcolor = ShapeTalk.drawingBoard.getBackground();
 			tempFile = File.createTempFile("shapetalktemp", "jdw");
 			final PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
 			pw.println(fgcolor.getRGB());
 			pw.println(bgcolor.getRGB());
 			pw.println(weightSlider.getValue());
 			pw.print(eraserCombo.getSelectedIndex());
-			pw.print(drawingBoard.getShapes());
+			pw.print(ShapeTalk.drawingBoard.getShapes());
 			pw.close();
 		} catch (final java.io.IOException ioe) {
 			JOptionPane.showMessageDialog(bg_frame, ioe,
@@ -1249,7 +1250,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				final int size = list.size();
 				for (int i = 0; i < size; i++) {
 					final String[] split2 = ((String) list.get(i)).split("\t");
-					IShape shape;
+					final IShape shape;
 					if (split2[0].equals("ShapeTalk.DrawingBoard.Line")) {
 						// shape = new Line();
 					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Rect")) {
@@ -1287,16 +1288,25 @@ public class ShapeTalk implements WindowListener, MouseListener,
 					"Error accessing temp file!", JOptionPane.ERROR_MESSAGE);
 		}
 		shapes = new String[] { "1", "2", "3" };
-		String[] patternExamples = { "dd MMMMM yyyy", "dd.MM.yy", "MM/dd/yy",
-				"yyyy.MM.dd G 'at' hh:mm:ss z", "EEE, MMM d, ''yy", "h:mm a",
-				"H:mm:ss:SSS", "K:mm a,z", "yyyy.MMMMM.dd GGG hh:mm aaa" };
+		final String[] patternExamples = { "dd MMMMM yyyy", "dd.MM.yy",
+				"MM/dd/yy", "yyyy.MM.dd G 'at' hh:mm:ss z", "EEE, MMM d, ''yy",
+				"h:mm a", "H:mm:ss:SSS", "K:mm a,z",
+				"yyyy.MMMMM.dd GGG hh:mm aaa" };
 		shapesComboBox = new JComboBox(patternExamples);
 		shapesComboBox.setEditable(false);
 	}
 
 	public void weightSliderStateChanged(ChangeEvent e) {
-		drawingBoard.setStrokeIndex(weightSlider.getValue());
+		ShapeTalk.drawingBoard.setStrokeIndex(weightSlider.getValue());
 	}
+
+	// public void weightComboActionPerformed(ActionEvent evt) {// GEN
+	// -
+	// FIRST
+	// :
+	// event_weightComboActionPerformed
+	// drawingBoard.setStrokeIndex(weightCombo.getSelectedIndex());
+	// }// GEN-LAST:event_weightComboActionPerformed
 
 	/*
 	 * (non-Javadoc)
@@ -1307,14 +1317,6 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		// TODO Auto-generated method stub
 
 	}
-
-	// public void weightComboActionPerformed(ActionEvent evt) {// GEN
-	// -
-	// FIRST
-	// :
-	// event_weightComboActionPerformed
-	// drawingBoard.setStrokeIndex(weightCombo.getSelectedIndex());
-	// }// GEN-LAST:event_weightComboActionPerformed
 
 	/*
 	 * (non-Javadoc)
@@ -1384,7 +1386,6 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	public JButton buttonOK;
 
 	public JScrollPane centerPane;
-
 	public JButton clearButton;
 	public JColorChooser colorChooser;
 	public JDialog colorChooserDialog;
@@ -1392,13 +1393,12 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	public JPanel colorPanel;
 	public JMenu conferenceMenu;
 	public JPanel confPanel;
+
 	public JPanel ctrlPanel;
 
 	public int currentSelectedShapeIndex;
 
 	public JToggleButton diamondButton;
-
-	public static DrawingBoard drawingBoard;
 
 	public JToggleButton eraserButton;
 
@@ -1456,9 +1456,13 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 	public JToggleButton rectButton;
 
+	public JToggleButton roundrectButton;
+
 	public JScrollPane scrollPaneChannelList;
 
 	public JToggleButton seleButton;
+
+	public JComboBox shapesComboBox;
 
 	public FileFilter shapeTalkDrawFilter = new FileFilter() {
 		@Override
@@ -1477,9 +1481,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	};
 
 	public JPanel statusBar;
-
 	public JTextField string2draw;
-
 	public JPanel strokeSettingsPane;
 	public JPanel strokeSettingsPanel;
 	public JToggleButton textButton;
@@ -1493,10 +1495,8 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	public JPanel toolsPanel;
 	public JComboBox weightCombo;
 	public JSlider weightSlider;
-	public JToggleButton roundrectButton;
-	public JComboBox shapesComboBox;
+	private File tempFile;
 	JCheckBox checkBoxFill;
 	JMenu editMenu;
 	JLabel fontPreview;
-	private File tempFile;
 }

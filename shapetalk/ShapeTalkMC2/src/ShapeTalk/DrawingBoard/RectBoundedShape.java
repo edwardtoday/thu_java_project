@@ -18,14 +18,14 @@ public abstract class RectBoundedShape implements IShape {
 	}
 
 	public String getShapeData() {
-//		int si = 0;
-//		for (int i = 0; i < DrawingBoard.STROKES.length; i++) {
-//			if (stroke == DrawingBoard.STROKES[i]) {
-//				si = i;
-//				break;
-//			}
-//		}
-		float si=stroke.getLineWidth();
+		// int si = 0;
+		// for (int i = 0; i < DrawingBoard.STROKES.length; i++) {
+		// if (stroke == DrawingBoard.STROKES[i]) {
+		// si = i;
+		// break;
+		// }
+		// }
+		final float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
@@ -86,10 +86,10 @@ public abstract class RectBoundedShape implements IShape {
 
 	protected Color color;
 
+	protected int filled;
+
 	protected int startX, startY, endX, endY;
 
 	protected BasicStroke stroke;
-
-	protected int filled;
 
 }

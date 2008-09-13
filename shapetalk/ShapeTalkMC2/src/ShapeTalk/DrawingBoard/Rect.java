@@ -35,10 +35,11 @@ public class Rect extends RectBoundedShape {
 			y = startY;
 			h = endY - startY;
 		}
-		if (filled == 0)
+		if (filled == 0) {
 			g.drawRect(x, y, w, h);
-		else
+		} else {
 			g.fillRect(x, y, w, h);
+		}
 
 	}
 

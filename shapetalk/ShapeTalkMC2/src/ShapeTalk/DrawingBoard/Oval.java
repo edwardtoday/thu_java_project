@@ -35,10 +35,11 @@ public class Oval extends RectBoundedShape {
 			y = startY;
 			h = endY - startY;
 		}
-		if (filled == 0)
+		if (filled == 0) {
 			g.drawOval(x, y, w, h);
-		else
+		} else {
 			g.fillOval(x, y, w, h);
+		}
 	}
 
 }

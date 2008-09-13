@@ -88,6 +88,6 @@ public class AttachmentMessage extends Message implements Serializable {
 	private String _filename;
 
 	private final boolean _requested; // The file is sent by the user, or
-										// requested by
+	// requested by
 	// another user share
 }
