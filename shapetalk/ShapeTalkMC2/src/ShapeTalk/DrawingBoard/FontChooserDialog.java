@@ -19,10 +19,22 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class NwFontChooserS extends JDialog {
-	// ////////////////////////////////////////////////////////////////////
-	public class NwList extends JPanel {
-		public NwList(String[] values) {
+/**
+ * FontChooserDialog.java
+ * 
+ * Code of the font chooser dialog.
+ * 
+ * @author Q
+ * 
+ */
+public class FontChooserDialog extends JDialog {
+	/**
+	 * Font List
+	 * 
+	 * @author Q
+	 */
+	public class FontList extends JPanel {
+		public FontList(final String[] values) {
 			setLayout(null);
 			jl = new JList(values);
 			sp = new JScrollPane(jl);
@@ -35,7 +47,7 @@ public class NwFontChooserS extends JDialog {
 			jl.setBounds(0, 0, 100, 1000);
 			jl.setBackground(Color.white);
 			jl.addListSelectionListener(new ListSelectionListener() {
-				public void valueChanged(ListSelectionEvent e) {
+				public void valueChanged(final ListSelectionEvent e) {
 					jt.setText((String) jl.getSelectedValue());
 					si = (String) jl.getSelectedValue();
 					showSample();
@@ -46,18 +58,21 @@ public class NwFontChooserS extends JDialog {
 		}
 
 		public String getSelectedValue() {
-			return (si);
+			return si;
 		}
 
+		/**
+		 * @see java.awt.Component#setBounds(int, int, int, int)
+		 */
 		@Override
-		public void setBounds(int x, int y, int w, int h) {
+		public void setBounds(final int x, final int y, final int w, final int h) {
 			super.setBounds(x, y, w, h);
 			sp.setBounds(0, y + 12, w, h - 23);
 			sp.revalidate();
 			jt.setBounds(0, 0, w, 20);
 		}
 
-		public void setSelectedItem(String s) {
+		public void setSelectedItem(final String s) {
 			jl.setSelectedValue(s, true);
 		}
 
@@ -73,26 +88,38 @@ public class NwFontChooserS extends JDialog {
 
 	static JLabel Sample = new JLabel();
 
-	public static Font showDialog(Frame parent, String s, Font font) {
-		final NwFontChooserS fd = new NwFontChooserS(parent, true, font);
+	/**
+	 * 
+	 * @param parent
+	 * @param s
+	 * @param font
+	 */
+	public static Font showDialog(final Frame parent, final String s,
+			final Font font) {
+		final FontChooserDialog fd = new FontChooserDialog(parent, true, font);
 		if (s != null) {
 			fd.setTitle(s);
 		}
 		fd.setVisible(true);
 		Font fo = null;
 		if (fd.ob) {
-			fo = NwFontChooserS.Sample.getFont();
+			fo = FontChooserDialog.Sample.getFont();
 		}
 		fd.dispose();
-		return (fo);
+		return fo;
 	}
 
-	private NwFontChooserS(Frame parent, boolean modal, Font font) {
+	/**
+	 * @param parent
+	 * @param modal
+	 * @param font
+	 */
+	private FontChooserDialog(final Frame parent, final boolean modal, Font font) {
 		super(parent, modal);
 		initAll();
 		setTitle("Font   Choosr");
 		if (font == null) {
-			font = NwFontChooserS.Sample.getFont();
+			font = FontChooserDialog.Sample.getFont();
 		}
 		FontList.setSelectedItem(font.getName());
 		SizeList.setSelectedItem(font.getSize() + "");
@@ -100,6 +127,9 @@ public class NwFontChooserS extends JDialog {
 
 	}
 
+	/**
+	 * Add buttons.
+	 */
 	private void addButtons() {
 		final JButton ok = new JButton("Ok");
 		ok.setMargin(new Insets(0, 0, 0, 0));
@@ -112,24 +142,27 @@ public class NwFontChooserS extends JDialog {
 		getContentPane().add(ok);
 		getContentPane().add(ca);
 		ok.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				setVisible(false);
 				ob = true;
 			}
 		});
 		ca.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
+			public void actionPerformed(final ActionEvent e) {
 				setVisible(false);
 				ob = false;
 			}
 		});
 	}
 
+	/**
+	 * Add font list.
+	 */
 	private void addLists() {
-		FontList = new NwList(GraphicsEnvironment.getLocalGraphicsEnvironment()
-				.getAvailableFontFamilyNames());
-		StyleList = new NwList(styleList);
-		SizeList = new NwList(sizeList);
+		FontList = new FontList(GraphicsEnvironment
+				.getLocalGraphicsEnvironment().getAvailableFontFamilyNames());
+		StyleList = new FontList(styleList);
+		SizeList = new FontList(sizeList);
 		FontList.setBounds(10, 10, 260, 295);
 		StyleList.setBounds(280, 10, 80, 295);
 		SizeList.setBounds(370, 10, 40, 295);
@@ -138,22 +171,28 @@ public class NwFontChooserS extends JDialog {
 		getContentPane().add(SizeList);
 	}
 
+	/**
+	 * Initialize font chooser dialog.
+	 */
 	private void initAll() {
 		getContentPane().setLayout(null);
 		setBounds(50, 50, 425, 400);
 		addLists();
 		addButtons();
-		NwFontChooserS.Sample.setBounds(10, 320, 415, 25);
-		NwFontChooserS.Sample.setForeground(Color.black);
-		getContentPane().add(NwFontChooserS.Sample);
+		FontChooserDialog.Sample.setBounds(10, 320, 415, 25);
+		FontChooserDialog.Sample.setForeground(Color.black);
+		getContentPane().add(FontChooserDialog.Sample);
 		addWindowListener(new WindowAdapter() {
 			@Override
-			public void windowClosing(java.awt.event.WindowEvent e) {
+			public void windowClosing(final java.awt.event.WindowEvent e) {
 				setVisible(false);
 			}
 		});
 	}
 
+	/**
+	 * Show font preview.
+	 */
 	private void showSample() {
 		int g = 0;
 		try {
@@ -168,13 +207,16 @@ public class NwFontChooserS extends JDialog {
 		if (st.equalsIgnoreCase("Italic")) {
 			s = Font.ITALIC;
 		}
-		NwFontChooserS.Sample.setFont(new Font(FontList.getSelectedValue(), s,
-				g));
-		NwFontChooserS.Sample
+		FontChooserDialog.Sample.setFont(new Font(FontList.getSelectedValue(),
+				s, g));
+		FontChooserDialog.Sample
 				.setText("The   quick   brown   fox   jumped   over   the   lazy   dog.");
 	}
 
-	NwList FontList;
+	/**
+	 * List of fonts.
+	 */
+	FontList FontList;
 
 	boolean ob = false;
 
@@ -182,9 +224,9 @@ public class NwFontChooserS extends JDialog {
 			"11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "22",
 			"24", "27", "30", "34", "39", "45", "51", "60" };
 
-	NwList SizeList;
+	FontList SizeList;
 
 	String[] styleList = new String[] { "Plain", "Bold", "Italic" };
 
-	NwList StyleList;
+	FontList StyleList;
 }

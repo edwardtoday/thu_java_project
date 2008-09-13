@@ -5,24 +5,43 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+/**
+ * PolyLine.java
+ * 
+ * Code of the Pencil tool.
+ * 
+ * @author Q
+ */
 public class PolyLine extends FreeShape {
 
 	public PolyLine() {
 		super();
 	}
 
-	public PolyLine(Color c, BasicStroke s, int x, int y) {
+	/**
+	 * @param c
+	 * @param s
+	 * @param x
+	 * @param y
+	 */
+	public PolyLine(final Color c, final BasicStroke s, final int x, final int y) {
 		super(c, s, x, y);
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * Draw the free line.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(color);
 		g.setStroke(stroke);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		final int[][] points = pointsSet.getPoints();
-		if (points == null)
+		if (points == null) {
 			return;
+		}
 		final int s = points[0].length;
 		if (s == 1) {
 			final int x = points[0][0];

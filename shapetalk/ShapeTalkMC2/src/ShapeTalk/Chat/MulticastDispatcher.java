@@ -5,9 +5,18 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+/**
+ * MulticastDispatcher.java
+ * 
+ * MulticastNetworkDispatcher is the derived class of NetworkDispather that
+ * sends data over the network using multicast sockets.
+ * 
+ * @author Q
+ */
 public class MulticastDispatcher extends NetworkDispatcher {
 	private class RecvThread extends Thread {
-		public RecvThread(NetworkDispatcher iDispatcher, MulticastSocket iSock) {
+		public RecvThread(final NetworkDispatcher iDispatcher,
+				final MulticastSocket iSock) {
 			_cSock = iSock;
 			_Dispatcher = iDispatcher;
 		}
@@ -35,10 +44,19 @@ public class MulticastDispatcher extends NetworkDispatcher {
 		private final NetworkDispatcher _Dispatcher;
 	}
 
+	/**
+	 * Default multicast group ip.
+	 */
 	public static final String DefaultMulticastGroupIP = "230.1.1.1";
 
+	/**
+	 * Default multicast group port.
+	 */
 	public static final int DefaultMulticastGroupPort = 1314;
 
+	/**
+	 * Receiver buffer size.
+	 */
 	private static final int RecvBufSize = 65536;
 
 	/** Creates a new instance of MulticastDispatcher */
@@ -54,7 +72,8 @@ public class MulticastDispatcher extends NetworkDispatcher {
 	}
 
 	@Override
-	protected void DispatchToAll(byte iBuf[], int iSize) throws Exception {
+	protected void DispatchToAll(final byte iBuf[], final int iSize)
+			throws Exception {
 		final DatagramPacket dPack = new DatagramPacket(iBuf, iSize, _curAddr,
 				_curPort);
 		_cSock.send(dPack);

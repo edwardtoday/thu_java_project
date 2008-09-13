@@ -3,6 +3,14 @@ package ShapeTalk.DrawingBoard;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 
+/**
+ * IShape.java
+ * 
+ * Interface that all the shapes should implement.
+ * 
+ * @author Q
+ * 
+ */
 public interface IShape {
 
 	/** Corresponding to mouse dragged event type */

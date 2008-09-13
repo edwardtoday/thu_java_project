@@ -7,12 +7,19 @@ import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 
+/**
+ * Manager.java
+ * 
+ * Manages conferences.
+ * 
+ * @author Q
+ */
 public class Manager {
 	public static final int DefaultOperTimeout = 3000;
 
 	private static final int MAX_RECVFILES_NUM = 50;
 
-	/* Singleton Structure */
+	/** Singleton */
 	private static Manager singObj;
 
 	public static Manager GetInstance() {
@@ -26,11 +33,9 @@ public class Manager {
 		return Manager.singObj;
 	}
 
-	/* End of Singleton Structure */
-
 	private Manager() throws Exception {
 		_Dispatcher = new MulticastDispatcher();
-		_me = User.Anonymous; // Anonymous user
+		_me = User.Anonymous;
 	}
 
 	public String[] GetAvailableChannels() {
@@ -51,9 +56,15 @@ public class Manager {
 		return _me;
 	}
 
-	public String[] GetUserShare(User iUser) {
-		if (!_SharingMap.containsKey(iUser))
+	/**
+	 * Get a user's sharing tree.
+	 * 
+	 * @param iUser
+	 */
+	public String[] GetUserShare(final User iUser) {
+		if (!_SharingMap.containsKey(iUser)) {
 			return null;
+		}
 		return (String[]) _SharingMap.get(iUser);
 	}
 
@@ -61,7 +72,7 @@ public class Manager {
 		return _curChan != null;
 	}
 
-	public boolean IsChannelFree(String iChanName) {
+	public boolean IsChannelFree(final String iChanName) {
 		_ChannelFree = true;
 		final ServiceMessage newMsg = new ServiceMessage(GetMe(),
 				ServiceMessage.CODE_QUERY_CHAN_FREE, iChanName);
@@ -73,7 +84,7 @@ public class Manager {
 		return _ChannelFree;
 	}
 
-	public void ParseMessage(Message iMsg) {
+	public void ParseMessage(final Message iMsg) {
 		if (iMsg instanceof ServiceMessage) {
 			ParseServiceMessage((ServiceMessage) iMsg);
 		} else if (iMsg instanceof ChannelMessage) {
@@ -96,9 +107,15 @@ public class Manager {
 		System.exit(0);
 	}
 
-	public void SendChanMessage(String iMsg) {
-		if (_curChan == null)
+	/**
+	 * Send channel message.
+	 * 
+	 * @param iMsg
+	 */
+	public void SendChanMessage(final String iMsg) {
+		if (_curChan == null) {
 			return;
+		}
 
 		final ChannelMessage newMsg = new ChannelMessage(iMsg, GetMe(),
 				_curChan);
@@ -106,14 +123,19 @@ public class Manager {
 
 	}
 
+	/**
+	 * Send file to all users on the current channel.
+	 */
 	public void SendFileToAll() {
 		try {
 
 			final java.io.File chFile = FileDialog.OpenFileDialog();
-			if (chFile == null)
+			if (chFile == null) {
 				return;
-			if (!chFile.exists())
+			}
+			if (!chFile.exists()) {
 				return;
+			}
 			if (chFile.length() > GetDispatcher().GetMaxFileSize()) {
 				JOptionPane.showMessageDialog(null,
 						"File is too big (max size: "
@@ -131,12 +153,23 @@ public class Manager {
 		}
 	}
 
-	public void SendPrivateMsg(User iTo, String iMsg) {
+	/**
+	 * Send private message.
+	 * 
+	 * @param iTo
+	 * @param iMsg
+	 */
+	public void SendPrivateMsg(final User iTo, final String iMsg) {
 		final PrivateMessage newMsg = new PrivateMessage(iMsg, GetMe(), iTo);
 		GetDispatcher().DispatchToAll(newMsg);
 	}
 
-	public void SetAndAdvertiseChannel(Channel iChan) {
+	/**
+	 * Set channel and advertise it.
+	 * 
+	 * @param iChan
+	 */
+	public void SetAndAdvertiseChannel(final Channel iChan) {
 		_curChan = iChan;
 		_curChan.AddUser(GetMe());
 		_ReqChan = "";
@@ -147,14 +180,20 @@ public class Manager {
 		_advThread.start();
 	}
 
-	public void SetMyShare(boolean iSet) {
+	/**
+	 * Set mt share file/folder.
+	 * 
+	 * @param iSet
+	 */
+	public void SetMyShare(final boolean iSet) {
 		if (!iSet) {
 			_myshare.Unshare();
 		} else {
 			final java.io.File shareFld = FileDialog.DirFileDialog();
 			if (shareFld == null || !shareFld.exists()
-					|| !shareFld.isDirectory())
+					|| !shareFld.isDirectory()) {
 				return;
+			}
 			_myshare.ShareDir(shareFld.getAbsolutePath());
 			System.out.println(_myshare.GetSharedFiles().length
 					+ " files shared");
@@ -165,6 +204,9 @@ public class Manager {
 		}
 	}
 
+	/**
+	 * Show received files.
+	 */
 	public void ShowRecvFiles() {
 		final AttachmentMessage[] recvArr = new AttachmentMessage[_recvfiles
 				.size()];
@@ -180,9 +222,15 @@ public class Manager {
 		}
 	}
 
-	public void StartPrivateConversation(User iTo) {
-		if (iTo == null)
+	/**
+	 * Start private conversation.
+	 * 
+	 * @param iTo
+	 */
+	public void StartPrivateConversation(final User iTo) {
+		if (iTo == null) {
 			return;
+		}
 		if (!_privconvs.containsKey(iTo)) {
 			_privconvs.put(iTo, new PrivateConversation(iTo));
 		} else {
@@ -190,7 +238,12 @@ public class Manager {
 		}
 	}
 
-	public boolean TrySetNick(String iNick) {
+	/**
+	 * Try to set a nickname.
+	 * 
+	 * @param iNick
+	 */
+	public boolean TrySetNick(final String iNick) {
 		_me = new User(iNick);
 		_me.SetStatus(User.STATUS_ASKINGNICK);
 		final ServiceMessage newMsg = new ServiceMessage(User.Anonymous,
@@ -200,14 +253,20 @@ public class Manager {
 			Thread.sleep(Manager.DefaultOperTimeout);
 		} catch (final InterruptedException ex) {
 		}
-		if (_me.GetStatus() == User.STATUS_NICKFAILED)
+		if (_me.GetStatus() == User.STATUS_NICKFAILED) {
 			return false;
+		}
 
 		_me.SetStatus(User.STATUS_AUTH);
 		return true;
 	}
 
-	private void ParseAttachmentMessage(AttachmentMessage iMsg) {
+	/**
+	 * Parse attachment messages.
+	 * 
+	 * @param iMsg
+	 */
+	private void ParseAttachmentMessage(final AttachmentMessage iMsg) {
 		if (iMsg.IsRequested()) {
 			frmUserShare.ForUser(iMsg.GetSender()).AddToCache(iMsg);
 		} else {
@@ -221,27 +280,46 @@ public class Manager {
 		}
 	}
 
-	private void ParseChannelMessage(ChannelMessage iMsg) {
-		if (iMsg.GetChannel() == null)
+	/**
+	 * Parse channel messages.
+	 * 
+	 * @param iMsg
+	 */
+	private void ParseChannelMessage(final ChannelMessage iMsg) {
+		if (iMsg.GetChannel() == null) {
 			return;
-		if (!iMsg.GetChannel().equals(_curChan))
+		}
+		if (!iMsg.GetChannel().equals(_curChan)) {
 			return;
+		}
 
 		iMsg.GetChannel().MessageReceived(iMsg);
 	}
 
-	private void ParsePrivateMessage(PrivateMessage iMsg) {
-		if (!iMsg.GetTo().equals(GetMe()))
+	/**
+	 * Parse private messages.
+	 * 
+	 * @param iMsg
+	 */
+	private void ParsePrivateMessage(final PrivateMessage iMsg) {
+		if (!iMsg.GetTo().equals(GetMe())) {
 			return;
+		}
 
 		StartPrivateConversation(iMsg.GetSender());
 		((PrivateConversation) _privconvs.get(iMsg.GetSender()))
 				.MessageArrival(iMsg.GetText());
 	}
 
-	private void ParseServiceMessage(ServiceMessage iMsg) {
-		if (!iMsg.IsBroadcast() && !iMsg.GetToUser().equals(GetMe()))
+	/**
+	 * Parse service messages.
+	 * 
+	 * @param iMsg
+	 */
+	private void ParseServiceMessage(final ServiceMessage iMsg) {
+		if (!iMsg.IsBroadcast() && !iMsg.GetToUser().equals(GetMe())) {
 			return;
+		}
 
 		switch (iMsg.GetCode()) {
 		case ServiceMessage.CODE_CHAN_ADV: {
@@ -255,8 +333,9 @@ public class Manager {
 			if (_curChan == null) {// my join
 				_ReqChan = iMsg.GetArg();
 			} else {// somone else join
-				if (!iMsg.GetArg().equals(_curChan.GetName()))
+				if (!iMsg.GetArg().equals(_curChan.GetName())) {
 					return;
+				}
 				_curChan.Join(iMsg.GetSender());
 
 				// Send helo to the client to notify it that i'm in the channel
@@ -285,31 +364,37 @@ public class Manager {
 				synchronized (WaitForJoinAck) {
 					WaitForJoinAck.notify();
 				}
-			} else if (_curChan == null && _ReqChan.length() <= 0)
+			} else if (_curChan == null && _ReqChan.length() <= 0) {
 				return;
+			}
 
-			if (!iMsg.GetArg().equals(_curChan.GetName()))
+			if (!iMsg.GetArg().equals(_curChan.GetName())) {
 				return;
+			}
 
 			_curChan.AddUser(iMsg.GetSender());
 		}
 			break;
 
 		case ServiceMessage.CODE_PART: {
-			if (_curChan == null)
+			if (_curChan == null) {
 				return;
-			if (!iMsg.GetArg().equals(_curChan.GetName()))
+			}
+			if (!iMsg.GetArg().equals(_curChan.GetName())) {
 				return;
+			}
 			_curChan.Part(iMsg.GetSender());
 
 		}
 			break;
 
 		case ServiceMessage.CODE_CHAN_OWNER: {
-			if (_curChan == null)
+			if (_curChan == null) {
 				return;
-			if (!iMsg.GetArg().equals(_curChan.GetName()))
+			}
+			if (!iMsg.GetArg().equals(_curChan.GetName())) {
 				return;
+			}
 			_curChan.SetOwner(iMsg.GetSender());
 		}
 			break;
@@ -341,8 +426,9 @@ public class Manager {
 			break;
 
 		case ServiceMessage.CODE_NICK_TAKEN: {
-			if (GetMe().GetStatus() != User.STATUS_ASKINGNICK)
+			if (GetMe().GetStatus() != User.STATUS_ASKINGNICK) {
 				return;
+			}
 			GetMe().SetStatus(User.STATUS_NICKFAILED);
 		}
 			break;
@@ -357,11 +443,13 @@ public class Manager {
 		case ServiceMessage.CODE_ASK_FILE: {
 			final String[] MyShareList = _myshare.GetSharedFiles();
 			System.out.println("requested shared file " + iMsg.GetArg());
-			if (MyShareList.length <= 0)
+			if (MyShareList.length <= 0) {
 				return;
+			}
 
-			if (Arrays.binarySearch(MyShareList, iMsg.GetArg()) < 0)
+			if (Arrays.binarySearch(MyShareList, iMsg.GetArg()) < 0) {
 				return;
+			}
 
 			final java.io.File sFile = new java.io.File(_myshare
 					.GetFullFilePath(iMsg.GetArg()));
@@ -384,7 +472,7 @@ public class Manager {
 		}
 	}
 
-	private void ParseSharingListMessage(SharingListMessage iMsg) {
+	private void ParseSharingListMessage(final SharingListMessage iMsg) {
 		_SharingMap.put(iMsg.GetSender(), iMsg.GetShareList());
 		if (_curChan != null) {
 			_curChan
@@ -401,24 +489,45 @@ public class Manager {
 
 	private boolean _ChannelFree = true;
 
+	/**
+	 * List of channels.
+	 */
 	private final ArrayList _ChannelList = new ArrayList();
 
+	/**
+	 * Current channel.
+	 */
 	private Channel _curChan;
 
 	private final NetworkDispatcher _Dispatcher;
 
 	private User _me;
 
+	/**
+	 * File sharing instance.
+	 */
 	private final FileSharing _myshare = new FileSharing();
 
+	/**
+	 * Private conversations tree.
+	 */
 	private final TreeMap _privconvs = new TreeMap();
 
+	/**
+	 * List of received files.
+	 */
 	private final LinkedList _recvfiles = new LinkedList();
 
+	/**
+	 * Received files frame.
+	 */
 	private frmRecvFiles _recvui;
 
 	private String _ReqChan = "";
 
+	/**
+	 * Sharing tree.
+	 */
 	private final TreeMap _SharingMap = new TreeMap();
 
 }

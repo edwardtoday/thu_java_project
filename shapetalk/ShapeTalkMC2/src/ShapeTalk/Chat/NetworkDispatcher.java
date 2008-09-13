@@ -17,6 +17,17 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/**
+ * NetworkDispatcher.java
+ * 
+ * NetworkDispatcher is a generic (abstract) class that delivers messages over
+ * the network. It does not really care how messages will be really delivered
+ * (derived classes will do it).
+ * 
+ * Supports password.
+ * 
+ * @author Q
+ */
 public abstract class NetworkDispatcher {
 
 	private static final byte BLOCK_ENCRYPTED = (byte) 0xba;
@@ -35,10 +46,15 @@ public abstract class NetworkDispatcher {
 		}
 	}
 
-	public void DispatchToAll(Message iMsg) {
+	/**
+	 * Dispath to all.
+	 * 
+	 * @param iMsg
+	 */
+	public void DispatchToAll(final Message iMsg) {
 		try {
 			final ByteArrayOutputStream bOut = new ByteArrayOutputStream();
-			final boolean EncData = (_keySet && !iMsg.DontEncrypt());
+			final boolean EncData = _keySet && !iMsg.DontEncrypt();
 
 			if (EncData) {
 				bOut.write(NetworkDispatcher.BLOCK_ENCRYPTED);
@@ -66,14 +82,24 @@ public abstract class NetworkDispatcher {
 		}
 	}
 
+	/**
+	 * Get max file size.
+	 * 
+	 */
 	public int GetMaxFileSize() {
-		if (_keySet)
+		if (_keySet) {
 			return _decCipher.getOutputSize(65000);
-		else
+		} else {
 			return 65000;
+		}
 	}
 
-	public void SetKey(String iKey) {
+	/**
+	 * Set key.
+	 * 
+	 * @param iKey
+	 */
+	public void SetKey(final String iKey) {
 		if (iKey == null || iKey.length() <= 0) {
 			_keySet = false;
 			return;
@@ -96,17 +122,25 @@ public abstract class NetworkDispatcher {
 		}
 	}
 
+	/**
+	 * Data received.
+	 * 
+	 * @param iBuf
+	 * @param iLen
+	 */
 	protected void DataReceived(byte[] iBuf, int iLen) {
 		try {
 			if (iBuf[0] == NetworkDispatcher.BLOCK_ENCRYPTED) {
-				if (!_keySet)
+				if (!_keySet) {
 					return;
+				}
 				final byte[] outBuf = new byte[_decCipher
 						.getOutputSize(iLen - 1) + 1];
 				iLen = _decCipher.doFinal(iBuf, 1, iLen - 1, outBuf, 1) + 1;
 				iBuf = outBuf;
-			} else if (iBuf[0] != NetworkDispatcher.BLOCK_UNENCRYPTED)
+			} else if (iBuf[0] != NetworkDispatcher.BLOCK_UNENCRYPTED) {
 				return;
+			}
 
 			final ByteArrayInputStream bIn = new ByteArrayInputStream(iBuf, 1,
 					iLen - 1);
@@ -128,7 +162,7 @@ public abstract class NetworkDispatcher {
 
 	}
 
-	protected void DispatchToAll(byte[] iBuf) throws Exception {
+	protected void DispatchToAll(final byte[] iBuf) throws Exception {
 		DispatchToAll(iBuf, iBuf.length);
 	}
 

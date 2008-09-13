@@ -2,6 +2,15 @@ package ShapeTalk.Chat;
 
 import java.io.Serializable;
 
+/**
+ * ServiceMessage.java
+ * 
+ * ServiceMessage is message sent by the software for synchronization and
+ * management (join, parts, etc.)
+ * 
+ * @author Q
+ * 
+ */
 public class ServiceMessage extends Message implements Serializable {
 	public final static char CODE_ASK_FILE = 'f';
 	public final static char CODE_ASK_SHARE = 's';
@@ -16,13 +25,14 @@ public class ServiceMessage extends Message implements Serializable {
 	public final static char CODE_QUERY_CHAN_FREE = 'c';
 	public final static char CODE_QUERY_NICK_FREE = 'n';
 
-	public ServiceMessage(User iFrom, char iCode, String iArg) {
+	public ServiceMessage(final User iFrom, final char iCode, final String iArg) {
 		super("", iFrom);
 		_code = iCode;
 		_arg = iArg;
 	}
 
-	public ServiceMessage(User iFrom, User iTo, char iCode, String iArg) {
+	public ServiceMessage(final User iFrom, final User iTo, final char iCode,
+			final String iArg) {
 		this(iFrom, iCode, iArg);
 		_to = iTo;
 	}
@@ -33,8 +43,9 @@ public class ServiceMessage extends Message implements Serializable {
 				|| _code == ServiceMessage.CODE_QUERY_NICK_FREE
 				|| _code == ServiceMessage.CODE_QUERY_CHAN_FREE
 				|| _code == ServiceMessage.CODE_NICK_TAKEN
-				|| _code == ServiceMessage.CODE_CHAN_TAKEN)
+				|| _code == ServiceMessage.CODE_CHAN_TAKEN) {
 			return true;
+		}
 		return false;
 	}
 

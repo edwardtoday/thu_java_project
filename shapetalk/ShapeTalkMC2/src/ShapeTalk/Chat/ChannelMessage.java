@@ -3,22 +3,53 @@ package ShapeTalk.Chat;
 import java.io.IOException;
 import java.io.Serializable;
 
+/**
+ * ChannelMessage.java
+ * 
+ * ChannelMessage is a text message sent by the user to a channel.
+ * 
+ * @author Q
+ * 
+ */
 public class ChannelMessage extends Message implements Serializable {
-	public ChannelMessage(String iMsg, User iFrom, Channel iToChan) {
+	/**
+	 * @param iMsg
+	 * @param iFrom
+	 * @param iToChan
+	 */
+	public ChannelMessage(final String iMsg, final User iFrom,
+			final Channel iToChan) {
 		super(iMsg, iFrom);
 		_channel = iToChan;
 	}
 
+	/**
+	 * Get channel.
+	 */
 	public Channel GetChannel() {
 		return _channel;
 	}
 
-	private void readObject(java.io.ObjectInputStream in) throws IOException,
-			ClassNotFoundException {
+	/**
+	 * Read object.
+	 * 
+	 * @param in
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 */
+	private void readObject(final java.io.ObjectInputStream in)
+			throws IOException, ClassNotFoundException {
 		_channel = Channel.GetByName(in.readUTF());
 	}
 
-	private void writeObject(java.io.ObjectOutputStream out) throws IOException {
+	/**
+	 * Write object.
+	 * 
+	 * @param out
+	 * @throws IOException
+	 */
+	private void writeObject(final java.io.ObjectOutputStream out)
+			throws IOException {
 		out.writeUTF(_channel.GetName());
 	}
 

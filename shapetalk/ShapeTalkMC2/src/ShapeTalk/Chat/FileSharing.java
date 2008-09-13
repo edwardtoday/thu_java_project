@@ -4,21 +4,42 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+/**
+ * FileSharing.java
+ * 
+ * Code of the FileSharing class.
+ * 
+ * @author Q
+ * 
+ */
 public class FileSharing {
 
 	public FileSharing() {
 	}
 
-	public FileSharing(String iShareFld) {
+	/**
+	 * @param iShareFld
+	 */
+	public FileSharing(final String iShareFld) {
 		ShareDir(iShareFld);
 	}
 
-	public String GetFullFilePath(String iFile) {
-		if (_BaseShareFolder == null)
+	/**
+	 * Get full file path.
+	 * 
+	 * @param iFile
+	 */
+	public String GetFullFilePath(final String iFile) {
+		if (_BaseShareFolder == null) {
 			return "";
+		}
 		return _BaseShareFolder.getAbsolutePath() + iFile;
 	}
 
+	/**
+	 * Get shared files.
+	 * 
+	 */
 	public String[] GetSharedFiles() {
 		final String[] outArr = new String[_SharedFiles.size()];
 		for (int i = 0; i < _SharedFiles.size(); i++) {
@@ -30,20 +51,34 @@ public class FileSharing {
 		return outArr;
 	}
 
-	public void ShareDir(String iPath) {
+	/**
+	 * Share a directory.
+	 * 
+	 * @param iPath
+	 */
+	public void ShareDir(final String iPath) {
 		_BaseShareFolder = new File(iPath);
 		_SharedFiles.clear();
-		if (!_BaseShareFolder.exists())
+		if (!_BaseShareFolder.exists()) {
 			return;
+		}
 		AddShareDir(_BaseShareFolder);
 	}
 
+	/**
+	 * Unshare directory.
+	 */
 	public void Unshare() {
 		_BaseShareFolder = null;
 		_SharedFiles.clear();
 	}
 
-	private void AddShareDir(File iDir) {
+	/**
+	 * Add shared directory.
+	 * 
+	 * @param iDir
+	 */
+	private void AddShareDir(final File iDir) {
 		final File[] fList = iDir.listFiles();
 		for (int i = 0; i < fList.length; i++) {
 
@@ -59,8 +94,14 @@ public class FileSharing {
 		}
 	}
 
+	/**
+	 * Base share folder.
+	 */
 	private File _BaseShareFolder;
 
+	/**
+	 * List of shared files.
+	 */
 	private final LinkedList _SharedFiles = new LinkedList();
 
 }

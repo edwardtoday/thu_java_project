@@ -5,6 +5,14 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+/**
+ * Diamond.java
+ * 
+ * Code of the Diamond tool.
+ * 
+ * @author Q
+ * 
+ */
 public class Diamond extends RectBoundedShape {
 
 	public Diamond() {
@@ -13,13 +21,24 @@ public class Diamond extends RectBoundedShape {
 		yS = new int[4];
 	}
 
-	public Diamond(Color c, BasicStroke s, int x, int y, int f) {
+	/**
+	 * @param c
+	 * @param s
+	 * @param x
+	 * @param y
+	 * @param f
+	 */
+	public Diamond(final Color c, final BasicStroke s, final int x,
+			final int y, final int f) {
 		super(c, s, x, y, f);
 		xS = new int[4];
 		yS = new int[4];
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(color);
 		g.setStroke(stroke);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -54,8 +73,13 @@ public class Diamond extends RectBoundedShape {
 		}
 	}
 
+	/**
+	 * X positions of the diamond.
+	 */
 	private final int[] xS;
-
+	/**
+	 * Y positions of the diamond.
+	 */
 	private final int[] yS;
 
 }

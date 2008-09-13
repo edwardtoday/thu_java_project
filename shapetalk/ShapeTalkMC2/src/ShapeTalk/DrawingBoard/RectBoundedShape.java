@@ -4,12 +4,27 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.event.MouseEvent;
 
+/**
+ * RectBoundedShape.java
+ * 
+ * Parent of all the rectangle bounded shape (,like rectangle, diamond, etc).
+ * 
+ * @author Q
+ */
 public abstract class RectBoundedShape implements IShape {
 
 	protected RectBoundedShape() {
 	}
 
-	protected RectBoundedShape(Color c, BasicStroke s, int x, int y, int f) {
+	/**
+	 * @param c
+	 * @param s
+	 * @param x
+	 * @param y
+	 * @param f
+	 */
+	protected RectBoundedShape(final Color c, final BasicStroke s, final int x,
+			final int y, final int f) {
 		color = c;
 		stroke = s;
 		startX = endX = x;
@@ -17,14 +32,10 @@ public abstract class RectBoundedShape implements IShape {
 		filled = f;
 	}
 
+	/**
+	 * @see ShapeTalk.DrawingBoard.IShape#getShapeData()
+	 */
 	public String getShapeData() {
-		// int si = 0;
-		// for (int i = 0; i < DrawingBoard.STROKES.length; i++) {
-		// if (stroke == DrawingBoard.STROKES[i]) {
-		// si = i;
-		// break;
-		// }
-		// }
 		final float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
@@ -43,9 +54,14 @@ public abstract class RectBoundedShape implements IShape {
 		return buffer.toString();
 	}
 
-	public void processCursorEvent(MouseEvent e, int t) {
-		if (t != IShape.CURSOR_DRAGGED)
+	/**
+	 * @see ShapeTalk.DrawingBoard.IShape#processCursorEvent(java.awt.event.MouseEvent,
+	 *      int)
+	 */
+	public void processCursorEvent(final MouseEvent e, final int t) {
+		if (t != IShape.CURSOR_DRAGGED) {
 			return;
+		}
 		final int x = e.getX();
 		final int y = e.getY();
 		if (e.isShiftDown()) {
@@ -56,7 +72,10 @@ public abstract class RectBoundedShape implements IShape {
 		}
 	}
 
-	public void setShapeData(String data) throws Exception {
+	/**
+	 * @see ShapeTalk.DrawingBoard.IShape#setShapeData(java.lang.String)
+	 */
+	public void setShapeData(final String data) throws Exception {
 		final String[] splits = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
 		stroke = new BasicStroke(Float.parseFloat(splits[1]));
@@ -70,8 +89,11 @@ public abstract class RectBoundedShape implements IShape {
 	/**
 	 * Regulate the bounding rectangle to a square with ending point coordinate
 	 * derived from the specified x, y.
+	 * 
+	 * @param x
+	 * @param y
 	 */
-	protected void regulateShape(int x, int y) {
+	protected void regulateShape(final int x, final int y) {
 		final int w = x - startX;
 		final int h = y - startY;
 		final int s = Math.min(Math.abs(w), Math.abs(h));
@@ -84,12 +106,24 @@ public abstract class RectBoundedShape implements IShape {
 		}
 	}
 
+	/**
+	 * Shape color.
+	 */
 	protected Color color;
 
+	/**
+	 * Whether shape is filled.
+	 */
 	protected int filled;
 
+	/**
+	 * Position data.
+	 */
 	protected int startX, startY, endX, endY;
 
+	/**
+	 * Stroke data.
+	 */
 	protected BasicStroke stroke;
 
 }

@@ -6,17 +6,31 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 
+/**
+ * Line.java
+ * 
+ * Code of the Line tool.
+ * 
+ * @author Q
+ * 
+ */
 public class Line extends RectBoundedShape {
 
 	public Line() {
 		super();
 	}
 
-	public Line(Color c, BasicStroke s, int x, int y, int f) {
+	public Line(final Color c, final BasicStroke s, final int x, final int y,
+			final int f) {
 		super(c, s, x, y, f);
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * Draw the line.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(color);
 		g.setStroke(stroke);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -33,11 +47,15 @@ public class Line extends RectBoundedShape {
 	 * slope of the line.
 	 * 
 	 * tan(30) = 0.577; tan(60) = 1.155;
+	 * 
+	 * @see ShapeTalk.DrawingBoard.RectBoundedShape#processCursorEvent(java.awt.event.MouseEvent,
+	 *      int)
 	 */
 	@Override
-	public void processCursorEvent(MouseEvent e, int t) {
-		if (t != IShape.CURSOR_DRAGGED)
+	public void processCursorEvent(final MouseEvent e, final int t) {
+		if (t != IShape.CURSOR_DRAGGED) {
 			return;
+		}
 		final int x = e.getX();
 		final int y = e.getY();
 		if (e.isShiftDown()) {
@@ -45,7 +63,7 @@ public class Line extends RectBoundedShape {
 				endX = startX;
 				endY = y;
 			} else {
-				final float slope = Math.abs(((float) (y - startY))
+				final float slope = Math.abs((float) (y - startY)
 						/ (x - startX));
 				if (slope < 0.577) { // horizontal
 					endX = x;

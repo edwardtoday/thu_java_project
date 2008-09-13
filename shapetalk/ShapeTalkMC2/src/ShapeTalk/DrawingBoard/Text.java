@@ -6,12 +6,27 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 
+/**
+ * Text.java
+ * 
+ * Code of the Text tool.
+ * 
+ * @author Q
+ */
 public class Text implements IShape {
 
 	public Text() {
 	}
 
-	public Text(String s, Color c, int x, int y, Font f) {
+	/**
+	 * @param s
+	 * @param c
+	 * @param x
+	 * @param y
+	 * @param f
+	 */
+	public Text(final String s, final Color c, final int x, final int y,
+			final Font f) {
 		this();
 		string = s;
 		color = c;
@@ -20,7 +35,12 @@ public class Text implements IShape {
 		font = f;
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * Draw the text.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(color);
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -28,6 +48,11 @@ public class Text implements IShape {
 		g.drawString(string, X, Y);
 	}
 
+	/**
+	 * Get Text shape data.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#getShapeData()
+	 */
 	public String getShapeData() {
 		final String si = string;
 		final StringBuffer buffer = new StringBuffer();
@@ -47,12 +72,21 @@ public class Text implements IShape {
 		return buffer.toString();
 	}
 
-	public void processCursorEvent(MouseEvent e, int t) {
+	/**
+	 * @see ShapeTalk.DrawingBoard.IShape#processCursorEvent(java.awt.event.MouseEvent,
+	 *      int)
+	 */
+	public void processCursorEvent(final MouseEvent e, final int t) {
 		X = e.getX();
 		Y = e.getY();
 	}
 
-	public void setShapeData(String data) throws Exception {
+	/**
+	 * Set Text shape data.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#setShapeData(java.lang.String)
+	 */
+	public void setShapeData(final String data) throws Exception {
 		final String splits[] = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
 		string = splits[1];
@@ -62,12 +96,24 @@ public class Text implements IShape {
 				.parseInt(splits[6]));
 	}
 
+	/**
+	 * Color of the Text shape.
+	 */
 	private Color color;
 
+	/**
+	 * Font of the Text shape.
+	 */
 	private Font font;
 
+	/**
+	 * String of the Text shape.
+	 */
 	private String string;
 
+	/**
+	 * Position of the Text shape.
+	 */
 	private int X, Y;
 
 }

@@ -1,7 +1,13 @@
 package ShapeTalk.Chat;
 
+/**
+ * PrivateConversation.java
+ * 
+ * @author Q
+ * 
+ */
 public class PrivateConversation {
-	public PrivateConversation(User iTo) {
+	public PrivateConversation(final User iTo) {
 		_to = iTo;
 		_ui = new frmPrivateConv(this);
 	}
@@ -10,7 +16,7 @@ public class PrivateConversation {
 		return _to;
 	}
 
-	public void MessageArrival(String iMsg) {
+	public void MessageArrival(final String iMsg) {
 		_ui.AddRecvLine("<" + _to.GetName() + "> " + iMsg);
 		if (!_ui.isVisible()) {
 			_ui.setVisible(true);
@@ -19,7 +25,7 @@ public class PrivateConversation {
 
 	}
 
-	public void SendMessage(String iMsg) {
+	public void SendMessage(final String iMsg) {
 		Manager.GetInstance().SendPrivateMsg(_to, iMsg);
 		_ui.AddRecvLine("<" + Manager.GetInstance().GetMe().GetName() + "> "
 				+ iMsg);

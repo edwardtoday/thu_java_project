@@ -2,15 +2,15 @@ package ShapeTalk.Chat;
 
 import java.io.Serializable;
 
+/**
+ * Message.java
+ * 
+ * The Message class.
+ * 
+ * @author Q
+ */
 public abstract class Message implements Serializable {
-	/*
-	 * public byte[] toByteArray(){ try { ByteArrayOutputStream bStream=new
-	 * ByteArrayOutputStream(); ObjectOutputStream dStream=new
-	 * ObjectOutputStream(bStream); dStream.writeObject(_from);
-	 * dStream.writeUTF(_text); dStream.close(); return bStream.toByteArray(); }
-	 * catch (IOException ex) { ex.printStackTrace(); return new byte[0]; } }
-	 */
-	protected Message(String iMsg, User iFrom) {
+	protected Message(final String iMsg, final User iFrom) {
 		_text = iMsg;
 		_from = iFrom;
 	}

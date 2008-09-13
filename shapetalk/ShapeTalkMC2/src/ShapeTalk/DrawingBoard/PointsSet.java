@@ -3,22 +3,37 @@ package ShapeTalk.DrawingBoard;
 import java.awt.Point;
 import java.util.ArrayList;
 
+/**
+ * PointSet.java
+ * 
+ * Code of the PointSet structure.
+ * 
+ * @author Q
+ * 
+ */
 public class PointsSet {
 
 	public PointsSet() {
 		points = new ArrayList();
 	}
 
-	public PointsSet(int initCap) {
+	public PointsSet(final int initCap) {
 		points = new ArrayList(initCap);
 	}
 
-	public void addPoint(int x, int y) {
+	/**
+	 * Add point (x,y)
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public void addPoint(final int x, final int y) {
 		final int size = points.size();
 		if (size > 0) {
 			final Point point = (Point) points.get(size - 1);
-			if (point.x == x && point.y == y)
+			if (point.x == x && point.y == y) {
 				return;
+			}
 		}
 		final Point p = new Point();
 		p.x = x;
@@ -26,10 +41,14 @@ public class PointsSet {
 		points.add(p);
 	}
 
+	/**
+	 * Get points.
+	 */
 	public int[][] getPoints() {
 		final int size = points.size();
-		if (size == 0)
+		if (size == 0) {
 			return null;
+		}
 		final int[][] result = new int[2][size];
 		for (int i = 0; i < size; i++) {
 			final Point p = (Point) points.get(i);
@@ -39,10 +58,17 @@ public class PointsSet {
 		return result;
 	}
 
-	public int[][] getPoints(int x, int y) {
+	/**
+	 * Get points with parameter x,y.
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	public int[][] getPoints(final int x, final int y) {
 		final int size = points.size();
-		if (size == 0)
+		if (size == 0) {
 			return null;
+		}
 		final int[][] result = new int[2][size + 1];
 		int i;
 		for (i = 0; i < size; i++) {
@@ -55,6 +81,9 @@ public class PointsSet {
 		return result;
 	}
 
+	/**
+	 * List of points.
+	 */
 	private final ArrayList points;
 
 }

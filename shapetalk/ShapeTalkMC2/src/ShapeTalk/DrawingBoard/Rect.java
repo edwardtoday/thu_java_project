@@ -5,17 +5,38 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+/**
+ * Rect.java
+ * 
+ * Code of the rectangle tool.
+ * 
+ * @author Q
+ * 
+ */
 public class Rect extends RectBoundedShape {
 
 	public Rect() {
 		super();
 	}
 
-	public Rect(Color c, BasicStroke s, int x, int y, int f) {
+	/**
+	 * @param c
+	 * @param s
+	 * @param x
+	 * @param y
+	 * @param f
+	 */
+	public Rect(final Color c, final BasicStroke s, final int x, final int y,
+			final int f) {
 		super(c, s, x, y, f);
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * Draw the rectangle.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(color);
 		g.setStroke(stroke);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

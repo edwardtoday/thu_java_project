@@ -1,7 +1,15 @@
 package ShapeTalk.Chat;
 
+/**
+ * ChanAdvertiserThread.java
+ * 
+ * Advertises channel after set up.
+ * 
+ * @author Q
+ * 
+ */
 public class ChanAdvertiserThread extends Thread {
-	public ChanAdvertiserThread(Channel iChan) {
+	public ChanAdvertiserThread(final Channel iChan) {
 		_channel = iChan;
 	}
 

@@ -8,7 +8,18 @@ import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.WindowConstants;
 
+/**
+ * FileDialog.java
+ * 
+ * Code of the file chooser dialog.
+ * 
+ * @author Q
+ * 
+ */
 public class FileDialog {
+	/**
+	 * Selected file.
+	 */
 	private static File _selfile;
 
 	public static File DirFileDialog() {
@@ -24,11 +35,18 @@ public class FileDialog {
 		return FileDialog.GenericFileDialog(JFileChooser.SAVE_DIALOG);
 	}
 
-	private static File GenericFileDialog(int iType) {
+	/**
+	 * @param iType
+	 */
+	private static File GenericFileDialog(final int iType) {
 		return FileDialog.GenericFileDialog(iType, JFileChooser.FILES_ONLY);
 	}
 
-	private static File GenericFileDialog(int iType, int iSelMode) {
+	/**
+	 * @param iType
+	 * @param iSelMode
+	 */
+	private static File GenericFileDialog(final int iType, final int iSelMode) {
 		FileDialog._selfile = null;
 		final JDialog fDiag = new JDialog();
 		fDiag.setModal(true);
@@ -38,7 +56,7 @@ public class FileDialog {
 
 		fc.setFileSelectionMode(iSelMode);
 		fc.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			public void actionPerformed(final ActionEvent evt) {
 				if (evt.getActionCommand().equals("ApproveSelection")) {
 					FileDialog._selfile = fc.getSelectedFile();
 				}

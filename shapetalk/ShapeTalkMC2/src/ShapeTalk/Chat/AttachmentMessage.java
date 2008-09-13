@@ -7,9 +7,24 @@ import java.io.Serializable;
 import java.security.MessageDigest;
 import java.util.Arrays;
 
+/**
+ * AttachmentMessage.java
+ * 
+ * AttachmentMessage represents a file sent by a user to the network (with its
+ * contents of course)
+ * 
+ * @author Q
+ * 
+ */
 public class AttachmentMessage extends Message implements Serializable {
-	public AttachmentMessage(User iFrom, File iFile, boolean iReq)
-			throws Exception {
+	/**
+	 * @param iFrom
+	 * @param iFile
+	 * @param iReq
+	 * @throws Exception
+	 */
+	public AttachmentMessage(final User iFrom, final File iFile,
+			final boolean iReq) throws Exception {
 		super(iFile.getName(), iFrom);
 		_filename = iFile.getName();
 		_filelength = (int) iFile.length();
@@ -25,10 +40,14 @@ public class AttachmentMessage extends Message implements Serializable {
 		return Arrays.equals(_checksum, CalcDigest());
 	}
 
+	/**
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof AttachmentMessage))
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof AttachmentMessage)) {
 			return false;
+		}
 		final AttachmentMessage tMsg = (AttachmentMessage) obj;
 		return GetSender().equals(tMsg.GetSender())
 				&& _filename.equals(tMsg._filename);
@@ -58,16 +77,26 @@ public class AttachmentMessage extends Message implements Serializable {
 		return _requested;
 	}
 
-	public void SaveToFile(String iPath) throws Exception {
+	/**
+	 * @param iPath
+	 * @throws Exception
+	 */
+	public void SaveToFile(final String iPath) throws Exception {
 		final FileOutputStream fOut = new FileOutputStream(iPath);
 		fOut.write(_filecontent);
 		fOut.close();
 	}
 
-	public void SetFileName(String iName) {
+	/**
+	 * @param iName
+	 */
+	public void SetFileName(final String iName) {
 		_filename = iName;
 	}
 
+	/**
+	 * @see java.lang.Object#toString()
+	 */
 	@Override
 	public String toString() {
 		return "[" + GetSender() + "] " + _filename + " ( " + _filelength
@@ -79,14 +108,29 @@ public class AttachmentMessage extends Message implements Serializable {
 		return md.digest(_filecontent);
 	}
 
+	/**
+	 * 
+	 */
 	private final byte[] _checksum;
 
+	/**
+	 * 
+	 */
 	private final byte[] _filecontent;
 
+	/**
+	 * 
+	 */
 	private final int _filelength;
 
+	/**
+	 * 
+	 */
 	private String _filename;
 
+	/**
+	 * 
+	 */
 	private final boolean _requested; // The file is sent by the user, or
 	// requested by
 	// another user share

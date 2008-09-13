@@ -3,29 +3,43 @@ package ShapeTalk.DrawingBoard;
 import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 
 import javax.swing.JComponent;
 
+/**
+ * Eraser.java
+ * 
+ * Code of the Eraser tool.
+ * 
+ * @author Q
+ * 
+ */
 public class Eraser extends FreeShape {
 
-	public Eraser(JComponent board) {
+	public Eraser(final JComponent board) {
 		this.board = board;
 	}
 
-	public Eraser(JComponent board, BasicStroke s, int x, int y) {
+	public Eraser(final JComponent board, final BasicStroke s, final int x,
+			final int y) {
 		super(null, s, x, y);
 		this.board = board;
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * Do erase.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(board.getBackground());
 		g.setStroke(stroke);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		final int[][] points = pointsSet.getPoints();
-		if (points == null)
+		if (points == null) {
 			return;
+		}
 		final int s = points[0].length;
 		if (s == 1) {
 			final int x = points[0][0];
@@ -36,6 +50,11 @@ public class Eraser extends FreeShape {
 		}
 	}
 
+	/**
+	 * Get eraser shape data.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.FreeShape#getShapeData()
+	 */
 	@Override
 	public String getShapeData() {
 		// int si = 0;
@@ -45,7 +64,7 @@ public class Eraser extends FreeShape {
 		// break;
 		// }
 		// }
-		float si = stroke.getLineWidth();
+		final float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(si);
 		final int[][] ps = pointsSet.getPoints();
@@ -58,8 +77,13 @@ public class Eraser extends FreeShape {
 		return buffer.toString();
 	}
 
+	/**
+	 * Set eraser shape data.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.FreeShape#setShapeData(java.lang.String)
+	 */
 	@Override
-	public void setShapeData(String data) throws Exception {
+	public void setShapeData(final String data) throws Exception {
 		final String splits[] = data.split(":");
 		stroke = new BasicStroke(Float.parseFloat(splits[0]));
 		for (int i = 1; i < splits.length; i += 2) {
@@ -68,6 +92,9 @@ public class Eraser extends FreeShape {
 		}
 	}
 
+	/**
+	 * Component on which to erase.
+	 */
 	private final JComponent board;
 
 }

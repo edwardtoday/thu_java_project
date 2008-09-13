@@ -7,7 +7,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,19 +14,25 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+/**
+ * DrawingBoard.java
+ * 
+ * The main drawing canvas class of ShapeTalk.
+ * 
+ * @author Q
+ * 
+ */
 public class DrawingBoard extends JPanel implements MouseListener,
 		MouseMotionListener {
 
-	public static final Stroke[] ERASER_STROKES = new Stroke[] {
-			new BasicStroke(15.0f), new BasicStroke(20.0f),
-			new BasicStroke(30.0f), new BasicStroke(50.0f),
-			new BasicStroke(100.0f) };
+	/**
+	 * List of shapes to redraw with "redo" command.
+	 */
 	public static ArrayList redos = new ArrayList(50);
+	/**
+	 * List of current shapes on the drawing board.
+	 */
 	public static ArrayList shapes;
-	public static final Stroke[] STROKES = new Stroke[] {
-			new BasicStroke(1.0f), new BasicStroke(2.0f),
-			new BasicStroke(5.0f), new BasicStroke(7.5f),
-			new BasicStroke(10.0f) };
 	public static final int TOOL_DIAMOND = 3;
 	public static final int TOOL_ERASER = 5;
 	public static final int TOOL_LINE = 0;
@@ -35,29 +40,53 @@ public class DrawingBoard extends JPanel implements MouseListener,
 	public static final int TOOL_PENCIL = 4;
 	public static final int TOOL_RECT = 1;
 	public static final int TOOL_ROUNDRECT = 7;
-
 	public static final int TOOL_SELE = 8;
-
 	public static final int TOOL_TEXT = 6;
 
+	/**
+	 * Decide whether the next shape is draw filled or not.
+	 */
 	private static int fill = 0;
 
+	/**
+	 * Fill color.
+	 */
+	private static Color fillColor = Color.WHITE;
+
+	/**
+	 * Font of the TEXT tool.
+	 */
 	private static Font font = new Font("Arial", Font.PLAIN, 18);
 
+	/**
+	 * String of the TEXT tool.
+	 */
 	private static String string2draw = "set your own string";
 
-	private static Color strokeColor = Color.BLACK, fillColor = Color.WHITE;
+	/**
+	 * Stroke color.
+	 */
+	private static Color strokeColor = Color.BLACK;
 
-	private static int strokeIndex, eraserIndex;
+	/**
+	 * Stroke index.
+	 */
+	private static int strokeIndex = 5;
 
+	/**
+	 * Current tool.
+	 */
 	private static int tool;
 
+	/**
+	 * Constructs the drawing board.
+	 */
 	public DrawingBoard() {
 		DrawingBoard.shapes = new ArrayList();
 		DrawingBoard.tool = DrawingBoard.TOOL_LINE;
 		currentShape = null;
 		DrawingBoard.strokeIndex = 0;
-		DrawingBoard.eraserIndex = 0;
+		// DrawingBoard.eraserIndex = 0;
 
 		setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 		setOpaque(true);
@@ -68,21 +97,35 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		addMouseMotionListener(this);
 	}
 
+	/**
+	 * Clear all shapes.
+	 */
 	public void clearBoard() {
 		System.out.print(DrawingBoard.shapes.get(0));
 		DrawingBoard.shapes.clear();
 		repaint();
 	}
 
+	/**
+	 * Getter of fillColor.
+	 */
 	public int getFill() {
 		return DrawingBoard.fill;
 	}
 
+	/**
+	 * Getter of font.
+	 * 
+	 * @see java.awt.Component#getFont()
+	 */
 	@Override
 	public Font getFont() {
 		return DrawingBoard.font;
 	}
 
+	/**
+	 * Get all current shapes.
+	 */
 	public String getShapes() {
 		final int size = DrawingBoard.shapes.size();
 		final StringBuffer buffer = new StringBuffer();
@@ -96,26 +139,49 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		return buffer.toString();
 	}
 
-	public void mouseClicked(MouseEvent e) {
+	/**
+	 * @see java.awt.event.MouseListener#mouseClicked(java.awt.event.MouseEvent)
+	 */
+	public void mouseClicked(final MouseEvent e) {
 	}
 
-	public void mouseDragged(MouseEvent e) {
+	/**
+	 * When mouse dragged, show preview of the shape to draw at current cursor
+	 * position.
+	 * 
+	 * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
+	 */
+	public void mouseDragged(final MouseEvent e) {
 		if (currentShape != null) {
 			currentShape.processCursorEvent(e, IShape.CURSOR_DRAGGED);
 			repaint();
 		}
 	}
 
-	public void mouseEntered(MouseEvent e) {
+	/**
+	 * @see java.awt.event.MouseListener#mouseEntered(java.awt.event.MouseEvent)
+	 */
+	public void mouseEntered(final MouseEvent e) {
 	}
 
-	public void mouseExited(MouseEvent e) {
+	/**
+	 * @see java.awt.event.MouseListener#mouseExited(java.awt.event.MouseEvent)
+	 */
+	public void mouseExited(final MouseEvent e) {
 	}
 
-	public void mouseMoved(MouseEvent e) {
+	/**
+	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
+	 */
+	public void mouseMoved(final MouseEvent e) {
 	}
 
-	public void mousePressed(MouseEvent e) {
+	/**
+	 * When mouse pressed, store the cursor position and set the shape info.
+	 * 
+	 * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
+	 */
+	public void mousePressed(final MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			if (DrawingBoard.fill == 0) {
 				setForeground(DrawingBoard.strokeColor);
@@ -175,7 +241,12 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		}
 	}
 
-	public void mouseReleased(MouseEvent e) {
+	/**
+	 * When mouse released, draw the shape and update the drawing board.
+	 * 
+	 * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
+	 */
+	public void mouseReleased(final MouseEvent e) {
 		if (e.getButton() == MouseEvent.BUTTON1 && currentShape != null) {
 			currentShape.processCursorEvent(e, IShape.LEFT_RELEASED);
 			currentShape = null;
@@ -183,30 +254,46 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		}
 	}
 
-	public void setEraserIndex(int i) {
-		if (i < 0 || i > 4)
-			throw new IllegalArgumentException("Invaild Size Specified!");
-		DrawingBoard.eraserIndex = i;
-	}
-
-	public void setFill(boolean f) {
+	/**
+	 * Setter of fill.
+	 * 
+	 * @param f
+	 * @see ShapeTalk.DrawingBoard.DrawingBoard#fill
+	 */
+	public void setFill(final boolean f) {
 		DrawingBoard.fill = f ? 1 : 0;
 	}
 
-	public void setFillColor(Color c) {
+	/**
+	 * Setter of fillColor.
+	 * 
+	 * @param c
+	 */
+	public void setFillColor(final Color c) {
 		if (c != null) {
 			DrawingBoard.fillColor = c;
 		}
 	}
 
+	/**
+	 * Setter of font.
+	 * 
+	 * @see javax.swing.JComponent#setFont(java.awt.Font)
+	 */
 	@Override
-	public void setFont(Font f) {
+	public void setFont(final Font f) {
 		if (f != null) {
 			DrawingBoard.font = f;
 		}
 	}
 
-	public void setShapes(ArrayList list) throws Exception {
+	/**
+	 * Rebuild the shapes list.
+	 * 
+	 * @param list
+	 * @throws Exception
+	 */
+	public void setShapes(final ArrayList list) throws Exception {
 		try {
 			final int size = list.size();
 			for (int i = 0; i < size; i++) {
@@ -242,31 +329,56 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		}
 	}
 
-	public void setString(String s) {
+	/**
+	 * Setter of string2draw.
+	 * 
+	 * @param s
+	 */
+	public void setString(final String s) {
 		DrawingBoard.string2draw = s;
 	}
 
-	public void setStrokeColor(Color c) {
+	/**
+	 * Setter of strokeColor.s
+	 * 
+	 * @param c
+	 */
+	public void setStrokeColor(final Color c) {
 		if (c != null) {
 			DrawingBoard.strokeColor = c;
 		}
 	}
 
-	public void setStrokeIndex(int i) {
-		// if (i < 0 || i > 4) {
-		// throw new IllegalArgumentException("Invaild Weight Specified!");
-		// }
+	/**
+	 * Setter of strokeIndex.
+	 * 
+	 * @param i
+	 */
+	public void setStrokeIndex(final int i) {
 		DrawingBoard.strokeIndex = i;
 	}
 
-	public void setTool(int t) {
-		if (t < DrawingBoard.TOOL_LINE || t > DrawingBoard.TOOL_SELE)
+	/**
+	 * Setter of current tool.
+	 * 
+	 * @param t
+	 */
+	public void setTool(final int t) {
+		if (t < DrawingBoard.TOOL_LINE || t > DrawingBoard.TOOL_SELE) {
 			throw new IllegalArgumentException("Invaild Tool Specified!");
+		}
 		DrawingBoard.tool = t;
 	}
 
+	/**
+	 * Paint the shapes on the drawing board.
+	 * 
+	 * Override the paintComponent method.
+	 * 
+	 * @see javax.swing.JComponent#paintComponent(java.awt.Graphics)
+	 */
 	@Override
-	protected void paintComponent(Graphics g) {
+	protected void paintComponent(final Graphics g) {
 		super.paintComponent(g);
 		final int size = DrawingBoard.shapes.size();
 		final Graphics2D g2d = (Graphics2D) g;
@@ -277,5 +389,8 @@ public class DrawingBoard extends JPanel implements MouseListener,
 		}
 	}
 
+	/**
+	 * Current shape.
+	 */
 	private IShape currentShape;
 }

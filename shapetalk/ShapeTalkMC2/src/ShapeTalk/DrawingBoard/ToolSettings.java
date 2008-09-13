@@ -4,7 +4,11 @@ import java.awt.Color;
 import java.awt.Font;
 
 /**
+ * ToolSettings.java
+ * 
  * Tool Settings objects group tool-related configuration information.
+ * 
+ * @author Q
  */
 public class ToolSettings {
 	public static final int ftNone = 0, ftOutline = 1, ftSolid = 2;

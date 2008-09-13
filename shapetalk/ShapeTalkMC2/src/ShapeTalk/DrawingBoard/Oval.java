@@ -5,17 +5,37 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
+/**
+ * Oval.java
+ * 
+ * Code of the Oval tool.
+ * 
+ * @author Q
+ */
 public class Oval extends RectBoundedShape {
 
 	public Oval() {
 		super();
 	}
 
-	public Oval(Color c, BasicStroke s, int x, int y, int f) {
+	/**
+	 * @param c
+	 * @param s
+	 * @param x
+	 * @param y
+	 * @param f
+	 */
+	public Oval(final Color c, final BasicStroke s, final int x, final int y,
+			final int f) {
 		super(c, s, x, y, f);
 	}
 
-	public void draw(Graphics2D g) {
+	/**
+	 * Draw the oval.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#draw(java.awt.Graphics2D)
+	 */
+	public void draw(final Graphics2D g) {
 		g.setColor(color);
 		g.setStroke(stroke);
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,

@@ -42,7 +42,6 @@ import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
@@ -72,22 +71,41 @@ import ShapeTalk.Chat.Channel;
 import ShapeTalk.Chat.Manager;
 import ShapeTalk.DrawingBoard.ColorPane;
 import ShapeTalk.DrawingBoard.DrawingBoard;
+import ShapeTalk.DrawingBoard.FontChooserDialog;
 import ShapeTalk.DrawingBoard.IShape;
-import ShapeTalk.DrawingBoard.NwFontChooserS;
 
+/**
+ * @author Q
+ * 
+ *         Main object of the application: ShapeTalk.
+ */
+/**
+ * @author Q
+ *
+ */
+/**
+ * @author Q
+ * 
+ */
 public class ShapeTalk implements WindowListener, MouseListener,
 		MouseMotionListener, ItemListener {
 
-	public static DrawingBoard drawingBoard;
+	/**
+	 * drawingBoard is the main drawing canvas.
+	 */
+	private static DrawingBoard drawingBoard;
 
-	public static boolean showPosition = false;
+	/**
+	 * Decide if the mouse position is shown in status bar
+	 */
+	private static boolean showPosition = false;
 
 	/**
 	 * Launch the application
 	 * 
 	 * @param args
 	 */
-	public static void main(String args[]) {
+	public static void main(final String args[]) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -107,34 +125,309 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		createContents();
 	}
 
-	public void bgButtonActionPerformed(ActionEvent evt) {// GEN-
-		// FIRST
-		// :
-		// event_bgButtonActionPerformed
-		final Color color = JColorChooser.showDialog(bg_frame,
-				"Change Fill Color", colorPane.getFillColor());
-		if (color != null) {
-			colorPane.setFillColor(color);
-			ShapeTalk.drawingBoard.setFillColor(color);
-		}
-	}// GEN-LAST:event_bgButtonActionPerformed
+	/**
+	 * @see java.awt.event.ItemListener#itemStateChanged(java.awt.event.ItemEvent)
+	 */
+	public void itemStateChanged(final ItemEvent e) {
+	}
 
-	public void btOKActionPerformed(ActionEvent evt) {// GEN-FIRST
-		// :
-		// event_btOKActionPerformed
-		currentToolLabel.setForeground(Color.RED);
-		currentToolLabel
-				.setText("Wait... Checking nick and channel availability");
+	/**
+	 * @param evt
+	 * 
+	 *            Set current tool to LINE
+	 */
+	public void lineButtonActionPerformed(final ActionEvent evt) {
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_LINE);
+	}
+
+	/**
+	 * @param evt
+	 * 
+	 *            Load image from .jdw file
+	 */
+	public void loadImageMenuItemActionPerformed(final ActionEvent evt) {
+
+		try {
+			if (filechooser1 == null) {
+				filechooser1 = new JFileChooser();
+				filechooser1.setFileFilter(shapeTalkDrawFilter);
+				filechooser1.setMultiSelectionEnabled(false);
+				filechooser1.setAcceptAllFileFilterUsed(false);
+			}
+			final int retVal = filechooser1.showOpenDialog(bg_frame);
+			if (retVal != JFileChooser.APPROVE_OPTION) {
+				return;
+			}
+			final BufferedReader br = new BufferedReader(new FileReader(
+					filechooser1.getSelectedFile()));
+			int rgb = Integer.parseInt(br.readLine());
+			final Color fgcolor = new Color(rgb);
+			ShapeTalk.drawingBoard.setForeground(fgcolor);
+			strokeColorButton.setBackground(fgcolor);
+			rgb = Integer.parseInt(br.readLine());
+			final Color bgcolor = new Color(rgb);
+			ShapeTalk.drawingBoard.setBackground(bgcolor);
+			fillColorButton.setBackground(bgcolor);
+			// weightCombo.setSelectedIndex(Integer.parseInt(br.readLine()));
+			weightSlider.setValue(Integer.parseInt(br.readLine()));
+			weightSlider.setValue(Integer.parseInt(br.readLine()));
+			// eraserSlider.setValue(Integer.parseInt(br.readLine()));
+			final ArrayList list = new ArrayList();
+			String str;
+			while ((str = br.readLine()) != null) {
+				list.add(str);
+			}
+			ShapeTalk.drawingBoard.setShapes(list);
+		} catch (final Exception e) {
+			JOptionPane.showMessageDialog(bg_frame, e, "Error!",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	}
+
+	/**
+	 * 
+	 * @see MouseListener#mouseClicked(MouseEvent)
+	 */
+	public void mouseClicked(final MouseEvent e) {
+
+	}
+
+	/**
+	 * 
+	 * When showPosition = true, show mouse position in status bar if
+	 * mouseDragged.
+	 * 
+	 * @see MouseMotionListener#mouseDragged(MouseEvent )
+	 */
+	public void mouseDragged(final MouseEvent e) {
+		if (ShapeTalk.showPosition) {
+			mousePositionLabel.setText("X=" + e.getX() + " Y=" + e.getY());
+		} else {
+			mousePositionLabel.setText("X=" + " Y=");
+		}
+	}
+
+	/**
+	 * If mouse cursor enters drawingBoard, set showPosition to true.
+	 * 
+	 * @see MouseListener#mouseEntered(MouseEvent)
+	 */
+	public void mouseEntered(final MouseEvent e) {
+		if (e.getSource().equals(ShapeTalk.drawingBoard)) {
+			ShapeTalk.showPosition = true;
+		}
+	}
+
+	/**
+	 * 
+	 * If mouse cursor exits drawingBoard, set showPosition to false.
+	 * 
+	 * @see MouseListener#mouseExited(MouseEvent)
+	 */
+	public void mouseExited(final MouseEvent e) {
+		if (e.getSource().equals(ShapeTalk.drawingBoard)) {
+			ShapeTalk.showPosition = false;
+			mousePositionLabel.setText("X=" + " Y=");
+		}
+	}
+
+	/**
+	 * 
+	 * When showPosition = true, show mouse position in status bar if
+	 * mouseMoved.
+	 * 
+	 * @see java.awt.event.MouseMotionListener#mouseMoved(java.awt.event.MouseEvent)
+	 */
+	public void mouseMoved(final MouseEvent e) {
+		if (ShapeTalk.showPosition) {
+			mousePositionLabel.setText("X=" + e.getX() + " Y=" + e.getY());
+		} else {
+			mousePositionLabel.setText("X=" + " Y=");
+		}
+	}
+
+	/**
+	 * 
+	 * @see MouseListener#mousePressed(MouseEvent)
+	 */
+	public void mousePressed(final MouseEvent m) {
+	}
+
+	/**
+	 * If mouseReleased in drawingBoard, update the shapesComboBox.
+	 * 
+	 * @see MouseListener#mouseReleased(MouseEvent)
+	 */
+	public void mouseReleased(final MouseEvent m) {
+		updateShapesComboBox();
+	}
+
+	/**
+	 * @param evt
+	 * 
+	 *            Update the channel list in starting conference panel
+	 */
+	public void updateChanListActionPerformed(final ActionEvent evt) {
+		UpdateChanList();
+	}
+
+	/**
+	 * Write temp file and update shapes ComboBox.
+	 */
+	public void updateShapesComboBox() {
+		String[] shapes = new String[ShapeTalk.drawingBoard.shapes.size()];
+		int index = 0;
+		// save temp file
+		try {
+			final Color fgcolor = ShapeTalk.drawingBoard.getForeground();
+			final Color bgcolor = ShapeTalk.drawingBoard.getBackground();
+			tempFile = File.createTempFile("shapetalktemp", "jdw");
+			final PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
+			pw.println(fgcolor.getRGB());
+			pw.println(bgcolor.getRGB());
+			pw.println(weightSlider.getValue());
+			pw.print(weightSlider.getValue());
+			pw.print(ShapeTalk.drawingBoard.getShapes());
+			pw.close();
+		} catch (final java.io.IOException ioe) {
+			JOptionPane.showMessageDialog(bg_frame, ioe,
+					"Error accessing temp file!", JOptionPane.ERROR_MESSAGE);
+		}
+
+		// load from temp file
+		try {
+			final BufferedReader br = new BufferedReader(new FileReader(
+					tempFile));
+			int spaceHolder = Integer.parseInt(br.readLine());
+			spaceHolder = Integer.parseInt(br.readLine());
+			spaceHolder = Integer.parseInt(br.readLine());
+			spaceHolder = Integer.parseInt(br.readLine());
+			final ArrayList list = new ArrayList();
+			String str;
+			while ((str = br.readLine()) != null) {
+				list.add(str);
+			}
+
+			try {
+				final int size = list.size();
+				for (int i = 0; i < size; i++) {
+					final String[] split2 = ((String) list.get(i)).split("\t");
+					final IShape shape;
+					if (split2[0].equals("ShapeTalk.DrawingBoard.Line")) {
+					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Rect")) {
+					} else if (split2[0]
+							.equals("ShapeTalk.DrawingBoard.RoundRect")) {
+					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Oval")) {
+					} else if (split2[0]
+							.equals("ShapeTalk.DrawingBoard.Diamond")) {
+					} else if (split2[0]
+							.equals("ShapeTalk.DrawingBoard.PolyLine")) {
+					} else if (split2[0]
+							.equals("ShapeTalk.DrawingBoard.Eraser")) {
+					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Text")) {
+					} else {
+					}
+					shapes[index] = split2[0];
+					index++;
+					System.out.println(split2[0]);
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+				throw e;
+			}
+		} catch (final Exception e) {
+			JOptionPane.showMessageDialog(bg_frame, e,
+					"Error accessing temp file!", JOptionPane.ERROR_MESSAGE);
+		}
+		shapes = new String[] { "1", "2", "3" };
+		final String[] patternExamples = { "dd MMMMM yyyy", "dd.MM.yy",
+				"MM/dd/yy", "yyyy.MM.dd G 'at' hh:mm:ss z", "EEE, MMM d, ''yy",
+				"h:mm a", "H:mm:ss:SSS", "K:mm a,z",
+				"yyyy.MMMMM.dd GGG hh:mm aaa" };
+		shapesComboBox = new JComboBox(patternExamples);
+		shapesComboBox.setEditable(false);
+	}
+
+	/**
+	 * @see java.awt.event.WindowListener#windowActivated(java.awt.event.WindowEvent)
+	 */
+	public void windowActivated(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 
+	 * @see WindowListener#windowClosed(WindowEvent)
+	 */
+	public void windowClosed(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 
+	 * @see WindowListener#windowClosing(WindowEvent)
+	 */
+	public void windowClosing(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 
+	 * @see WindowListener#windowDeactivated(WindowEvent )
+	 */
+	public void windowDeactivated(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 
+	 * @see WindowListener#windowDeiconified(WindowEvent )
+	 */
+	public void windowDeiconified(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 
+	 * @see WindowListener#windowIconified(WindowEvent)
+	 */
+	public void windowIconified(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * 
+	 * @see WindowListener#windowOpened(WindowEvent)
+	 */
+	public void windowOpened(final WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * OK button clicked, start new conference
+	 * 
+	 * @param evt
+	 */
+	private void btOKActionPerformed(final ActionEvent evt) {
+		messageLabel.setForeground(Color.RED);
+		messageLabel.setText("Wait... Checking nick and channel availability");
 		if (GetNick().length() == 0) {
-			currentToolLabel.setForeground(Color.RED);
-			currentToolLabel.setText("Nick cannot be empty");
+			messageLabel.setForeground(Color.RED);
+			messageLabel.setText("Nick cannot be empty");
 			return;
 		}
 
 		if (listChannelList.getSelectedValue() == null
 				&& !GetCreateNewChannel()) {
-			currentToolLabel.setForeground(Color.RED);
-			currentToolLabel
+			messageLabel.setForeground(Color.RED);
+			messageLabel
 					.setText("You must select a channel to join or create a new one");
 			return;
 		}
@@ -148,8 +441,8 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		}
 
 		if (!NickAvail) {
-			currentToolLabel.setForeground(Color.RED);
-			currentToolLabel.setText("Nick already taken");
+			messageLabel.setForeground(Color.RED);
+			messageLabel.setText("Nick already taken");
 			return;
 		}
 
@@ -157,24 +450,24 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			if (ChanAvail) {
 				Channel.CreateNew(GetNewChannelName(), GetNewChannelKey());
 			} else {
-				currentToolLabel.setForeground(Color.RED);
-				currentToolLabel.setText("Channel already exists");
+				messageLabel.setForeground(Color.RED);
+				messageLabel.setText("Channel already exists");
 			}
 		} else {
 			final String selChan = (String) listChannelList.getSelectedValue();
 			try {
 				Channel.JoinExisting(selChan, GetSelChannelKey());
 
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Join requested");
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Join requested");
 				// System.out.println("Join requested");
 				synchronized (Manager.GetInstance().WaitForJoinAck) {
 					Manager.GetInstance().WaitForJoinAck
 							.wait(Manager.DefaultOperTimeout);
 				}
 				if (Manager.GetInstance().GetCurrentChannel() == null) {
-					currentToolLabel.setForeground(Color.RED);
-					currentToolLabel
+					messageLabel.setForeground(Color.RED);
+					messageLabel
 							.setText("Timeout waiting welcome acknowledgement (probably due to a WRONG KEY)");
 				}
 			} catch (final Exception ex) {
@@ -182,30 +475,45 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			}
 		}
 		confPanel.setVisible(false);
-		currentToolLabel.setForeground(Color.BLACK);
-		currentToolLabel.setText("Conference started.");
-	}// GEN-LAST:event_btOKActionPerformed
+		messageLabel.setForeground(Color.BLACK);
+		messageLabel.setText("Conference started.");
+	}
 
-	public void changeFontButtonActionPerformed() {
+	/**
+	 * 
+	 * Open dialog to set a new drawing font.
+	 */
+	private void changeFontButtonActionPerformed() {
 		Font font = ShapeTalk.drawingBoard.getFont();
-		font = NwFontChooserS.showDialog(bg_frame, null, font);
+		font = FontChooserDialog.showDialog(bg_frame, null, font);
 		ShapeTalk.drawingBoard.setFont(font);
 		string2draw.setFont(font);
 	}
 
-	public void checkBoxFillStateChanged(ItemEvent e) {
+	/**
+	 * Set filled status of drawingBoard.
+	 * 
+	 * @see ShapeTalk.DrawingBoard#fill
+	 * 
+	 * @param e
+	 */
+	private void checkBoxFillStateChanged(final ItemEvent e) {
 		ShapeTalk.drawingBoard.setFill(checkBoxFill.isSelected());
 	}
 
-	public void clearButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_clearButtonActionPerformed
+	/**
+	 * Clear all shapes
+	 * 
+	 * @param evt
+	 */
+	private void clearButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.clearBoard();
-	}// GEN-LAST:event_clearButtonActionPerformed
+	}
 
-	public void create_drawingboard() {
+	/**
+	 * Create a new drawingboard
+	 */
+	private void create_drawingboard() {
 
 		ShapeTalk.drawingBoard = new DrawingBoard();
 		ShapeTalk.drawingBoard.setSize(new Dimension(1600, 1200));
@@ -225,7 +533,10 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 	}
 
-	public void createConfPane() {
+	/**
+	 * create a conference panel
+	 */
+	private void createConfPane() {
 
 		confPanel = new JPanel();
 		confPanel.setMaximumSize(new Dimension(500, 900));
@@ -239,9 +550,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	}
 
 	/**
-	 * Initialize the contents of the frame
+	 * Initialize the contents of the application frame
 	 */
-	public void createContents() {
+	private void createContents() {
 
 		/**
 		 * create background frame
@@ -250,13 +561,11 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		bg_frame.setTitle("Shape Talk");
 		bg_frame.getContentPane().setFocusCycleRoot(true);
 		bg_frame.getContentPane().setLayout(new BorderLayout());
-		final Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();// 得到屏幕的大小
-		final int MARGIN = 30;
-		bg_frame.setBounds((int) (MARGIN / 2), (int) (MARGIN / 2),
-				(int) ((screen.getWidth() - MARGIN)), (int) ((screen
-						.getHeight()
-						- MARGIN - 20)));
-		// bg_frame.setBounds(100, 100, 1043, 610);
+		screen = Toolkit.getDefaultToolkit().getScreenSize();
+		margin = 30;
+		bg_frame.setBounds((int) (margin / 2), (int) (margin / 2),
+				(int) (screen.getWidth() - margin), (int) (screen.getHeight()
+						- margin - 20));
 		bg_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		createMenu();
@@ -267,7 +576,10 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		create_drawingboard();
 	}
 
-	public void createMenu() {
+	/**
+	 * create main menu
+	 */
+	private void createMenu() {
 		mainMenu = new JMenuBar();
 		bg_frame.setJMenuBar(mainMenu);
 		{
@@ -277,8 +589,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			fileMenu.setText("File");
 			mainMenu.add(fileMenu);
 			{
-				// Open Image
-				final JMenuItem openImageMenuItem = new JMenuItem();
+				openImageMenuItem = new JMenuItem();
 				openImageMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						loadImageMenuItemActionPerformed(e);
@@ -286,8 +597,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				});
 				openImageMenuItem.setText("Open Image");
 				fileMenu.add(openImageMenuItem);
-				// Save Image
-				final JMenuItem saveImageMenuItem = new JMenuItem();
+				saveImageMenuItem = new JMenuItem();
 				saveImageMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						saveImageMenuItemActionPerformed(e);
@@ -296,7 +606,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				saveImageMenuItem.setText("Save Image");
 				fileMenu.add(saveImageMenuItem);
 
-				final JMenuItem saveAsPNGMenuItem = new JMenuItem();
+				saveAsPNGMenuItem = new JMenuItem();
 				saveAsPNGMenuItem.setText("SaveAsPNG");
 				saveAsPNGMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
@@ -306,8 +616,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				fileMenu.add(saveAsPNGMenuItem);
 
 				fileMenu.addSeparator();
-				// Quit
-				final JMenuItem quitMenuItem = new JMenuItem();
+				quitMenuItem = new JMenuItem();
 				quitMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						bg_frame.dispose();
@@ -322,8 +631,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			editMenu.setText("Menu");
 			mainMenu.add(editMenu);
 			{
-				// Undo
-				final JMenuItem undoMenuItem = new JMenuItem();
+				undoMenuItem = new JMenuItem();
 				undoMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						undoMenuItemActionPerformed();
@@ -331,8 +639,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				});
 				undoMenuItem.setText("Undo");
 				editMenu.add(undoMenuItem);
-				// Redo
-				final JMenuItem redoMenuItem = new JMenuItem();
+				redoMenuItem = new JMenuItem();
 				redoMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						redoMenuItemActionPerformed();
@@ -346,8 +653,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			conferenceMenu.setText("Conference");
 			mainMenu.add(conferenceMenu);
 			{
-				// Start Conference
-				final JMenuItem startConfMenuItem = new JMenuItem();
+				startConfMenuItem = new JMenuItem();
 				startConfMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
 						// startConfMenuItem.setEnabled(false);
@@ -358,26 +664,28 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				conferenceMenu.add(startConfMenuItem);
 				// Stop Conference
 			}
-			// Help
-			final JMenu helpMenuItem = new JMenu();
+			helpMenuItem = new JMenu();
 			helpMenuItem.setText("Help");
 			mainMenu.add(helpMenuItem);
 			{
-				// About
-				final JMenuItem viewDocMenuItem = new JMenuItem();
+				viewDocMenuItem = new JMenuItem();
 				viewDocMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
-						new AboutDialog(bg_frame);
+						new WebBrowser();
 						return;
 					}
 				});
-				viewDocMenuItem.setText("View Doc");
+				viewDocMenuItem.setText("View Online Doc");
 				helpMenuItem.add(viewDocMenuItem);
 			}
 		}
 	}
 
-	public void createStatusbar() {
+	/**
+	 * Create status bar. Contains tool description and shows mouse cursor
+	 * position.
+	 */
+	private void createStatusbar() {
 		statusBar = new JPanel();
 		final FlowLayout flowLayout = new FlowLayout();
 		flowLayout.setAlignment(FlowLayout.RIGHT);
@@ -386,10 +694,10 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		statusBar.setPreferredSize(new Dimension(0, 24));
 		bg_frame.getContentPane().add(statusBar, BorderLayout.SOUTH);
 
-		currentToolLabel = new JLabel();
-		currentToolLabel.setForeground(Color.BLACK);
-		currentToolLabel.setText("");
-		statusBar.add(currentToolLabel);
+		messageLabel = new JLabel();
+		messageLabel.setForeground(Color.BLACK);
+		messageLabel.setText("");
+		statusBar.add(messageLabel);
 
 		mousePositionLabel = new JLabel();
 		mousePositionLabel.setName("");
@@ -398,7 +706,10 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		statusBar.add(mousePositionLabel);
 	}
 
-	public void createToolPane() {
+	/**
+	 * Create tool panel
+	 */
+	private void createToolPane() {
 		toolsGroup = new ButtonGroup();
 
 		ctrlPanel = new JPanel();
@@ -407,10 +718,10 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 		colorPanel = new JPanel();
 		colorPanel.setLayout(new BorderLayout());
-		fgButton = new JButton();
-		fgButton.setName("fgButton");
-		bgButton = new JButton();
-		bgButton.setName("bgButton");
+		strokeColorButton = new JButton();
+		strokeColorButton.setName("fgButton");
+		fillColorButton = new JButton();
+		fillColorButton.setName("bgButton");
 
 		// eraserSlider = new JSlider(0, 100, 0);
 
@@ -430,10 +741,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		seleButton.setSelected(true);
 		seleButton.setText("Select");
 		seleButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel
-						.setText("Select shapes and do transformations.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Select shapes and do transformations.");
 				seleButtonActionPerformed(evt);
 			}
 		});
@@ -445,9 +755,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		lineButton.setSelected(true);
 		lineButton.setText("Line");
 		lineButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw lines.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to draw lines.");
 				lineButtonActionPerformed(evt);
 			}
 		});
@@ -458,9 +768,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		rectButton.setFont(new Font("Dialog", 0, 10));
 		rectButton.setText("Rect");
 		rectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw rectangles.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to draw rectangles.");
 				rectButtonActionPerformed(evt);
 			}
 		});
@@ -471,9 +781,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		roundrectButton.setFont(new Font("Dialog", 0, 10));
 		roundrectButton.setText("Round Rect");
 		roundrectButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw round rectangles.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to draw round rectangles.");
 				roundrectButtonActionPerformed(evt);
 			}
 		});
@@ -484,9 +794,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		ovalButton.setFont(new Font("Dialog", 0, 10));
 		ovalButton.setText("Oval");
 		ovalButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw ovals.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to draw ovals.");
 				ovalButtonActionPerformed(evt);
 			}
 		});
@@ -497,9 +807,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		diamondButton.setFont(new Font("Dialog", 0, 10));
 		diamondButton.setText("Diamond");
 		diamondButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw diamonds.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to draw diamonds.");
 				diamondButtonActionPerformed(evt);
 			}
 		});
@@ -510,9 +820,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		pencilButton.setFont(new Font("Dialog", 0, 10));
 		pencilButton.setText("Pencil");
 		pencilButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to draw freely.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to draw freely.");
 				pencilButtonActionPerformed(evt);
 			}
 		});
@@ -523,9 +833,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		eraserButton.setFont(new Font("Dialog", 0, 10));
 		eraserButton.setText("Eraser");
 		eraserButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Drag to erase.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Drag to erase.");
 				eraserButtonActionPerformed(evt);
 			}
 		});
@@ -535,9 +845,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		textButton.setFont(new Font("Dialog", 0, 10));
 		textButton.setText("Text");
 		textButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				currentToolLabel.setForeground(Color.BLACK);
-				currentToolLabel.setText("Click to draw text.");
+			public void actionPerformed(final ActionEvent evt) {
+				messageLabel.setForeground(Color.BLACK);
+				messageLabel.setText("Click to draw text.");
 				textButtonActionPerformed(evt);
 			}
 		});
@@ -547,15 +857,13 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		clearButton.setFont(new Font("Dialog", 1, 10));
 		clearButton.setText("Clear");
 		clearButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			public void actionPerformed(final ActionEvent evt) {
 				clearButtonActionPerformed(evt);
 			}
 		});
 
 		toolButtonsPane.add(clearButton);
-
 		toolsPanel.add(toolButtonsPane);
-
 		toolSettingsPane.add(toolsPanel);
 
 		final GridBagLayout gridBagLayout = new GridBagLayout();
@@ -566,14 +874,14 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		toolSettingsPane.setLayout(new BoxLayout(toolSettingsPane,
 				BoxLayout.Y_AXIS));
 		{
-			currentToolLabel.setForeground(Color.BLACK);
-			currentToolLabel.setText("Select shapes");
-			currentToolLabel.setForeground(Color.BLACK);
-			currentToolLabel.setText("Drag to draw lines.");
+			messageLabel.setForeground(Color.BLACK);
+			messageLabel.setText("Select shapes");
+			messageLabel.setForeground(Color.BLACK);
+			messageLabel.setText("Drag to draw lines.");
 		}
 		{
 			colorPanel.setBorder(new TitledBorder("Color Settings"));
-			final JPanel colorPanelLeft = new JPanel();
+			colorPanelLeft = new JPanel();
 			colorPanelLeft.setLayout(new BorderLayout());
 			colorPanel.add("West", colorPanelLeft);
 			colorPane = new ColorPane(35);
@@ -590,24 +898,24 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			checkBoxFill.setText("Fill");
 			colorPanelLeft.add("South", checkBoxFill);
 
-			final JPanel colorPanelRight = new JPanel();
+			colorPanelRight = new JPanel();
 			colorPanelRight.setLayout(new BorderLayout());
 			colorPanel.add("East", colorPanelRight);
-			fgButton.setText("Set Stroke Color");
-			fgButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					fgButtonActionPerformed(evt);
+			strokeColorButton.setText("Set Stroke Color");
+			strokeColorButton.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent evt) {
+					strokeColorButtonActionPerformed(evt);
 				}
 			});
-			colorPanelRight.add(fgButton);
+			colorPanelRight.add(strokeColorButton);
 
-			bgButton.setText("Set Fill Color");
-			bgButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					bgButtonActionPerformed(evt);
+			fillColorButton.setText("Set Fill Color");
+			fillColorButton.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent evt) {
+					fillColorButtonActionPerformed(evt);
 				}
 			});
-			colorPanelRight.add(bgButton, BorderLayout.SOUTH);
+			colorPanelRight.add(fillColorButton, BorderLayout.SOUTH);
 
 			toolSettingsPane.add(colorPanel);
 		}
@@ -625,35 +933,12 @@ public class ShapeTalk implements WindowListener, MouseListener,
 					TitledBorder.DEFAULT_POSITION, null, null));
 			strokeSettingsPane.add(weightSlider, BorderLayout.NORTH);
 
-			// eraserSlider.setBorder(new TitledBorder(null, "Eraser Size",
-			// TitledBorder.DEFAULT_JUSTIFICATION,
-			// TitledBorder.DEFAULT_POSITION, null, null));
-			// eraserSlider.addChangeListener(new ChangeListener() {
-			// public void stateChanged(final ChangeEvent e) {
-			// eraserSliderStateChanged(e);
-			// }
-			// });
-			// strokeSettingsPane.add(eraserSlider, BorderLayout.SOUTH);
-
-			// weightCombo.setFont(new Font("Dialog", 0, 10));
-			// weightCombo.setModel(new DefaultComboBoxModel(new String[] {
-			// "Stroke Weight 1.0px", "Stroke Weight 2.0px",
-			// "Stroke Weight 5.0px", "Stroke Weight 7.5px",
-			// "Stroke Weight 10.0px" }));
-			// weightCombo.addActionListener(new ActionListener() {
-			// public void actionPerformed(ActionEvent evt) {
-			// weightComboActionPerformed(evt);
-			// }
-			// });
-			//
-			// strokeSettingsPane.add(weightCombo, BorderLayout.NORTH);
-
 			strokeSettingsPanel.add(strokeSettingsPane);
 
 			toolSettingsPane.add(strokeSettingsPanel);
 		}
 		{
-			final JPanel shapesPane = new JPanel();
+			shapesPane = new JPanel();
 			toolSettingsPane.add(shapesPane);
 			shapesPane.setLayout(new BorderLayout());
 			shapesPane.setBorder(new TitledBorder(null, "Shapes",
@@ -663,11 +948,11 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			shapesComboBox = new JComboBox();
 			shapesPane.add(shapesComboBox, BorderLayout.NORTH);
 
-			final JPanel shapesEditPane = new JPanel();
+			shapesEditPane = new JPanel();
 			shapesEditPane.setLayout(new GridLayout(2, 0));
 			shapesPane.add(shapesEditPane, BorderLayout.SOUTH);
 
-			final JButton deleteShapeButton = new JButton();
+			deleteShapeButton = new JButton();
 			deleteShapeButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 					int index = shapesComboBox.getSelectedIndex();
@@ -679,7 +964,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			deleteShapeButton.setText("Delete");
 			shapesEditPane.add(deleteShapeButton);
 
-			final JButton scaleButton = new JButton();
+			scaleButton = new JButton();
 			scaleButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 				}
@@ -687,7 +972,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			scaleButton.setText("Scale");
 			shapesEditPane.add(scaleButton);
 
-			final JButton rotateButton = new JButton();
+			rotateButton = new JButton();
 			rotateButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 				}
@@ -695,7 +980,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			rotateButton.setText("Rotate");
 			shapesEditPane.add(rotateButton);
 
-			final JButton shearButton = new JButton();
+			shearButton = new JButton();
 			shearButton.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 				}
@@ -710,7 +995,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 			toolSettingsPane.add(fontSettingsPane);
 
-			final JButton changeFont = new JButton();
+			changeFont = new JButton();
 			changeFont.addActionListener(new ActionListener() {
 				public void actionPerformed(final ActionEvent e) {
 					changeFontButtonActionPerformed();
@@ -735,66 +1020,79 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		ctrlPanel.add(toolSettingsPane, gridBagConstraints);
 	}
 
-	public void diamondButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_diamondButtonActionPerformed
+	/**
+	 * Set tool to DIAMOND.
+	 * 
+	 * @param evt
+	 */
+	private void diamondButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_DIAMOND);
-	}// GEN-LAST:event_diamondButtonActionPerformed
+	}
 
-	public void eraserButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_eraserButtonActionPerformed
+	/**
+	 * Set tool to ERASER
+	 * 
+	 * @param evt
+	 */
+	private void eraserButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_ERASER);
-	}// GEN-LAST:event_eraserButtonActionPerformed
+	}
 
-	// GEN-LAST:event_eraserComboActionPerformed
-
-	public void fgButtonActionPerformed(ActionEvent evt) {// GEN-
-		// FIRST
-		// :
-		// event_fgButtonActionPerformed
+	/**
+	 * 
+	 * Show JColorChooser dialog to change fillColor.
+	 * 
+	 * @param evt
+	 */
+	private void fillColorButtonActionPerformed(final ActionEvent evt) {
 		final Color color = JColorChooser.showDialog(bg_frame,
-				"Change Stroke Color", colorPane.getStrokeColor());
+				"Change Fill Color", colorPane.getFillColor());
 		if (color != null) {
-			ShapeTalk.drawingBoard.setStrokeColor(color);
-			colorPane.setStrokeColor(color);
+			colorPane.setFillColor(color);
+			ShapeTalk.drawingBoard.setFillColor(color);
 		}
-	}// GEN-LAST:event_fgButtonActionPerformed
+	}
 
-	public boolean GetCreateNewChannel() {
+	/**
+	 * @return if(name of the new channel to be created) > 0.
+	 */
+	private boolean GetCreateNewChannel() {
 		return textFieldNewChannelName.getText().length() > 0;
 	}
 
-	public String GetNewChannelKey() {
+	/**
+	 * @return key of the new channel to be created.
+	 */
+	private String GetNewChannelKey() {
 
 		return textFieldInputKey.getText();
 	}
 
-	public String GetNewChannelName() {
+	/**
+	 * @return name of the new channel to be created.
+	 */
+	private String GetNewChannelName() {
 		return textFieldNewChannelName.getText();
 	}
 
-	public String GetNick() {
+	/**
+	 * @return nickname the user inputs
+	 */
+	private String GetNick() {
 		return textFieldNickname.getText();
 	}
 
-	// public void eraserSliderStateChanged(ChangeEvent evt) {// GEN
-	// // -
-	// // FIRST
-	// // :
-	// // event_eraserComboActionPerformed
-	// drawingBoard.setEraserIndex(eraserSlider.getValue());
-	// }// GEN-LAST:event_eraserComboActionPerformed
-
-	public String GetSelChannelKey() {
+	/**
+	 * @return new channel key the user inputs
+	 */
+	private String GetSelChannelKey() {
 		return textFieldSetKey.getText();
 	}
 
-	public void initConfPaneComponents() {
+	/**
+	 * Initialize conference panel components
+	 */
+	private void initConfPaneComponents() {
 		textFieldNickname = new JTextField();
 		textFieldNewChannelName = new JTextField();
 		textFieldSetKey = new JTextField();
@@ -841,7 +1139,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		labelName.setBounds(10, 250, 60, 20);
 
 		textFieldNewChannelName.addKeyListener(new KeyAdapter() {
-			public void keyTyped(KeyEvent evt) {
+			public void keyTyped(final KeyEvent evt) {
 				tbNewChanKeyTyped(evt);
 			}
 		});
@@ -860,7 +1158,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 		buttonOK.setText("OK");
 		buttonOK.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
+			public void actionPerformed(final ActionEvent evt) {
 				btOKActionPerformed(evt);
 			}
 		});
@@ -870,8 +1168,8 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 		labelUpdateList.setText("Update List");
 		labelUpdateList.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				jButton1ActionPerformed(evt);
+			public void actionPerformed(final ActionEvent evt) {
+				updateChanListActionPerformed(evt);
 			}
 		});
 
@@ -888,168 +1186,38 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 	}
 
-	public void itemStateChanged(ItemEvent e) {
-	}
-
-	public void jButton1ActionPerformed(ActionEvent evt) {// GEN-
-		// FIRST
-		// :
-		// event_jButton1ActionPerformed
-		UpdateChanList();
-	}// GEN-LAST:event_jButton1ActionPerformed
-
-	public void lineButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_lineButtonActionPerformed
-		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_LINE);
-	}// GEN-LAST:event_lineButtonActionPerformed
-
-	public void loadImageMenuItemActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_loadButtonActionPerformed
-		try {
-			if (filechooser1 == null) {
-				filechooser1 = new JFileChooser();
-				filechooser1.setFileFilter(shapeTalkDrawFilter);
-				filechooser1.setMultiSelectionEnabled(false);
-				filechooser1.setAcceptAllFileFilterUsed(false);
-			}
-			final int retVal = filechooser1.showOpenDialog(bg_frame);
-			if (retVal != JFileChooser.APPROVE_OPTION)
-				return;
-			final BufferedReader br = new BufferedReader(new FileReader(
-					filechooser1.getSelectedFile()));
-			int rgb = Integer.parseInt(br.readLine());
-			final Color fgcolor = new Color(rgb);
-			ShapeTalk.drawingBoard.setForeground(fgcolor);
-			fgButton.setBackground(fgcolor);
-			rgb = Integer.parseInt(br.readLine());
-			final Color bgcolor = new Color(rgb);
-			ShapeTalk.drawingBoard.setBackground(bgcolor);
-			bgButton.setBackground(bgcolor);
-			// weightCombo.setSelectedIndex(Integer.parseInt(br.readLine()));
-			weightSlider.setValue(Integer.parseInt(br.readLine()));
-			weightSlider.setValue(Integer.parseInt(br.readLine()));
-			// eraserSlider.setValue(Integer.parseInt(br.readLine()));
-			final ArrayList list = new ArrayList();
-			String str;
-			while ((str = br.readLine()) != null) {
-				list.add(str);
-			}
-			ShapeTalk.drawingBoard.setShapes(list);
-		} catch (final Exception e) {
-			JOptionPane.showMessageDialog(bg_frame, e, "Error!",
-					JOptionPane.ERROR_MESSAGE);
-		}
-	}// GEN-LAST:event_loadButtonActionPerformed
-
-	/*
-	 * (non-Javadoc)
+	/**
 	 * 
-	 * @see MouseListener#mouseClicked(MouseEvent)
-	 */
-	public void mouseClicked(MouseEvent e) {
-
-	}
-
-	/*
-	 * (non-Javadoc)
+	 * Set tool to OVAL
 	 * 
-	 * @see MouseMotionListener#mouseDragged(MouseEvent )
+	 * @param evt
 	 */
-	public void mouseDragged(MouseEvent e) {
-		if (ShapeTalk.showPosition) {
-			mousePositionLabel.setText("X=" + e.getX() + " Y=" + e.getY());
-		} else {
-			mousePositionLabel.setText("X=" + " Y=");
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see MouseListener#mouseEntered(MouseEvent)
-	 */
-	public void mouseEntered(MouseEvent e) {
-		if (e.getSource().equals(ShapeTalk.drawingBoard)) {
-			ShapeTalk.showPosition = true;
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see MouseListener#mouseExited(MouseEvent)
-	 */
-	public void mouseExited(MouseEvent e) {
-		if (e.getSource().equals(ShapeTalk.drawingBoard)) {
-			ShapeTalk.showPosition = false;
-			mousePositionLabel.setText("X=" + " Y=");
-		}
-	}
-
-	public void mouseMoved(MouseEvent e) {
-		if (ShapeTalk.showPosition) {
-			mousePositionLabel.setText("X=" + e.getX() + " Y=" + e.getY());
-		} else {
-			mousePositionLabel.setText("X=" + " Y=");
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see MouseListener#mousePressed(MouseEvent)
-	 */
-	public void mousePressed(MouseEvent m) {
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see MouseListener#mouseReleased(MouseEvent)
-	 */
-	public void mouseReleased(MouseEvent m) {
-		updateShapesComboBox();
-	}
-
-	public void ovalButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_ovalButtonActionPerformed
+	private void ovalButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_OVAL);
-	}// GEN-LAST:event_ovalButtonActionPerformed
+	}
 
-	// End of variables declaration//GEN-END:variables
-
-	public void pencilButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_pencilButtonActionPerformed
-		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_PENCIL);
-	}// GEN-LAST:event_pencilButtonActionPerformed
-
-	/*
-	 * (non-Javadoc)
+	/**
+	 * Set tool to PENCIL
 	 * 
-	 * @see MouseMotionListener#mouseMoved(MouseEvent)
+	 * @param evt
 	 */
+	private void pencilButtonActionPerformed(final ActionEvent evt) {
+		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_PENCIL);
+	}
 
-	public void rectButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_rectButtonActionPerformed
+	/**
+	 * Set tool to RECTANGLE
+	 * 
+	 * @param evt
+	 */
+	private void rectButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_RECT);
-	}// GEN-LAST:event_rectButtonActionPerformed
+	}
 
-	public void redoMenuItemActionPerformed() {
+	/**
+	 * Redo last move.
+	 */
+	private void redoMenuItemActionPerformed() {
 		if (ShapeTalk.drawingBoard.redos.size() > 0) {
 			ShapeTalk.drawingBoard.shapes.add(ShapeTalk.drawingBoard.shapes
 					.get(ShapeTalk.drawingBoard.redos.size() - 1));
@@ -1059,19 +1227,21 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		}
 	}
 
-	public void roundrectButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_rectButtonActionPerformed
+	/**
+	 * Set tool to ROUNDRECTANGLE
+	 * 
+	 * @param evt
+	 */
+	private void roundrectButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_ROUNDRECT);
-	}// GEN-LAST:event_rectButtonActionPerformed
+	}
 
-	public void saveAsPNGMenuItemActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_exportButtonActionPerformed
+	/**
+	 * Save current image as a PNG file to disk.
+	 * 
+	 * @param evt
+	 */
+	private void saveAsPNGMenuItemActionPerformed(final ActionEvent evt) {
 		try {
 			if (filechooser2 == null) {
 				filechooser2 = new JFileChooser();
@@ -1080,8 +1250,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				filechooser2.setAcceptAllFileFilterUsed(false);
 			}
 			final int retVal = filechooser2.showSaveDialog(bg_frame);
-			if (retVal != JFileChooser.APPROVE_OPTION)
+			if (retVal != JFileChooser.APPROVE_OPTION) {
 				return;
+			}
 			File file = filechooser2.getSelectedFile();
 			if (!file.getName().toLowerCase().endsWith(".png")) {
 				file = new File(file.getAbsolutePath() + ".png");
@@ -1097,13 +1268,14 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			JOptionPane.showMessageDialog(bg_frame, e, "Error!",
 					JOptionPane.ERROR_MESSAGE);
 		}
-	}// GEN-LAST:event_exportButtonActionPerformed
+	}
 
-	public void saveImageMenuItemActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_saveButtonActionPerformed
+	/**
+	 * Save image as ShapeTalk file format.
+	 * 
+	 * @param evt
+	 */
+	private void saveImageMenuItemActionPerformed(final ActionEvent evt) {
 		try {
 			if (filechooser1 == null) {
 				filechooser1 = new JFileChooser();
@@ -1112,8 +1284,9 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				filechooser1.setAcceptAllFileFilterUsed(false);
 			}
 			final int retVal = filechooser1.showSaveDialog(bg_frame);
-			if (retVal != JFileChooser.APPROVE_OPTION)
+			if (retVal != JFileChooser.APPROVE_OPTION) {
 				return;
+			}
 			File file = filechooser1.getSelectedFile();
 			if (!file.getName().toLowerCase().endsWith(".jdw")) {
 				file = new File(file.getAbsolutePath() + ".jdw");
@@ -1133,42 +1306,73 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			JOptionPane.showMessageDialog(bg_frame, ioe, "Error!",
 					JOptionPane.ERROR_MESSAGE);
 		}
-	}// GEN-LAST:event_saveButtonActionPerformed
+	}
 
-	public void seleButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_lineButtonActionPerformed
+	/**
+	 * Set tool to SELETION
+	 * 
+	 * @param evt
+	 */
+	private void seleButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_SELE);
-	}// GEN-LAST:event_lineButtonActionPerformed
+	}
 
-	public void startConf() {
+	/**
+	 * Initialize new conference.
+	 */
+	private void startConf() {
 		Manager.GetInstance();
 
 		confPanel.setVisible(true);
 		initConfPaneComponents();
 	}
 
-	public void string2drawChanged(ActionEvent e) {
+	/**
+	 * Change the string to draw.
+	 * 
+	 * @param e
+	 */
+	private void string2drawChanged(final ActionEvent e) {
 		ShapeTalk.drawingBoard.setString(string2draw.getText());
 	}
 
-	public void tbNewChanKeyTyped(KeyEvent evt) {// GEN-FIRST:
-		// event_tbNewChanKeyTyped
+	/**
+	 * Show ColorChooser dialog to set stroke color.
+	 * 
+	 * @param evt
+	 */
+	private void strokeColorButtonActionPerformed(final ActionEvent evt) {
+		final Color color = JColorChooser.showDialog(bg_frame,
+				"Change Stroke Color", colorPane.getStrokeColor());
+		if (color != null) {
+			ShapeTalk.drawingBoard.setStrokeColor(color);
+			colorPane.setStrokeColor(color);
+		}
+	}
+
+	/**
+	 * Get the new channel name.
+	 * 
+	 * @param evt
+	 */
+	private void tbNewChanKeyTyped(final KeyEvent evt) {
 		textFieldInputKey
 				.setEnabled(textFieldNewChannelName.getText().length() > 0);
-	}// GEN-LAST:event_tbNewChanKeyTyped
+	}
 
-	public void textButtonActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_textButtonActionPerformed
+	/**
+	 * Set tool to TEXT.
+	 * 
+	 * @param evt
+	 */
+	private void textButtonActionPerformed(final ActionEvent evt) {
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_TEXT);
-	}// GEN-LAST:event_textButtonActionPerformed
+	}
 
-	public void undoMenuItemActionPerformed() {
+	/**
+	 * Undo last move.
+	 */
+	private void undoMenuItemActionPerformed() {
 		if (ShapeTalk.drawingBoard.shapes.size() > 0) {
 			ShapeTalk.drawingBoard.redos.add(ShapeTalk.drawingBoard.shapes
 					.get(ShapeTalk.drawingBoard.shapes.size() - 1));
@@ -1178,9 +1382,12 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		}
 	}
 
-	public void UpdateChanList() {
+	/**
+	 * Update channel list.
+	 */
+	private void UpdateChanList() {
 		listChannelList.setModel(new AbstractListModel() {
-			public Object getElementAt(int i) {
+			public Object getElementAt(final int i) {
 				return strings[i];
 			}
 
@@ -1193,239 +1400,29 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 	}
 
-	public void updateShapesComboBox() {
-		String[] shapes = new String[ShapeTalk.drawingBoard.shapes.size()];
-		int index = 0;
-		// save temp file
-		try {
-			final Color fgcolor = ShapeTalk.drawingBoard.getForeground();
-			final Color bgcolor = ShapeTalk.drawingBoard.getBackground();
-			tempFile = File.createTempFile("shapetalktemp", "jdw");
-			final PrintWriter pw = new PrintWriter(new FileWriter(tempFile));
-			pw.println(fgcolor.getRGB());
-			pw.println(bgcolor.getRGB());
-			pw.println(weightSlider.getValue());
-			pw.print(weightSlider.getValue());
-			pw.print(ShapeTalk.drawingBoard.getShapes());
-			pw.close();
-		} catch (final java.io.IOException ioe) {
-			JOptionPane.showMessageDialog(bg_frame, ioe,
-					"Error accessing temp file!", JOptionPane.ERROR_MESSAGE);
-		}
-
-		// load from temp file
-		try {
-			final BufferedReader br = new BufferedReader(new FileReader(
-					tempFile));
-			int spaceHolder = Integer.parseInt(br.readLine());
-			spaceHolder = Integer.parseInt(br.readLine());
-			spaceHolder = Integer.parseInt(br.readLine());
-			spaceHolder = Integer.parseInt(br.readLine());
-			final ArrayList list = new ArrayList();
-			String str;
-			while ((str = br.readLine()) != null) {
-				list.add(str);
-			}
-
-			// drawingBoard.setShapes(list);
-			try {
-				final int size = list.size();
-				for (int i = 0; i < size; i++) {
-					final String[] split2 = ((String) list.get(i)).split("\t");
-					final IShape shape;
-					if (split2[0].equals("ShapeTalk.DrawingBoard.Line")) {
-						// shape = new Line();
-					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Rect")) {
-						// shape = new Rect();
-					} else if (split2[0]
-							.equals("ShapeTalk.DrawingBoard.RoundRect")) {
-						// shape = new RoundRect();
-					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Oval")) {
-						// shape = new Oval();
-					} else if (split2[0]
-							.equals("ShapeTalk.DrawingBoard.Diamond")) {
-						// shape = new Diamond();
-					} else if (split2[0]
-							.equals("ShapeTalk.DrawingBoard.PolyLine")) {
-						// shape = new PolyLine();
-					} else if (split2[0]
-							.equals("ShapeTalk.DrawingBoard.Eraser")) {
-						// shape = new Eraser(this);
-					} else if (split2[0].equals("ShapeTalk.DrawingBoard.Text")) {
-						// shape = new Text();
-					} else {
-						// throw new Exception("Invalid Shape Data!");
-					}
-					// shape.setShapeData(split2[1]);
-					shapes[index] = split2[0];
-					index++;
-					System.out.println(split2[0]);
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-				throw e;
-			}
-		} catch (final Exception e) {
-			JOptionPane.showMessageDialog(bg_frame, e,
-					"Error accessing temp file!", JOptionPane.ERROR_MESSAGE);
-		}
-		shapes = new String[] { "1", "2", "3" };
-		final String[] patternExamples = { "dd MMMMM yyyy", "dd.MM.yy",
-				"MM/dd/yy", "yyyy.MM.dd G 'at' hh:mm:ss z", "EEE, MMM d, ''yy",
-				"h:mm a", "H:mm:ss:SSS", "K:mm a,z",
-				"yyyy.MMMMM.dd GGG hh:mm aaa" };
-		shapesComboBox = new JComboBox(patternExamples);
-		shapesComboBox.setEditable(false);
-	}
-
-	public void weightSliderStateChanged(ChangeEvent e) {
+	/**
+	 * Set new stroke index.
+	 * 
+	 * @see ShapeTalk.DrawingBoard#strokeIndex
+	 * 
+	 * @param e
+	 */
+	private void weightSliderStateChanged(final ChangeEvent e) {
 		ShapeTalk.drawingBoard.setStrokeIndex(weightSlider.getValue());
 	}
 
-	// public void weightComboActionPerformed(ActionEvent evt) {// GEN
-	// -
-	// FIRST
-	// :
-	// event_weightComboActionPerformed
-	// drawingBoard.setStrokeIndex(weightCombo.getSelectedIndex());
-	// }// GEN-LAST:event_weightComboActionPerformed
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowActivated(WindowEvent)
+	/**
+	 * FileFilter to check if the input file has a extension of "png".
 	 */
-	public void windowActivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowClosed(WindowEvent)
-	 */
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowClosing(WindowEvent)
-	 */
-	public void windowClosing(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowDeactivated(WindowEvent )
-	 */
-	public void windowDeactivated(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowDeiconified(WindowEvent )
-	 */
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowIconified(WindowEvent)
-	 */
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see WindowListener#windowOpened(WindowEvent)
-	 */
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public JFrame bg_frame;
-
-	public JButton bgButton;
-
-	// Variables declaration - do not modify//GEN-BEGIN:variables
-	public JButton buttonOK;
-
-	public JScrollPane centerPane;
-	public JButton clearButton;
-	public JColorChooser colorChooser;
-	public JDialog colorChooserDialog;
-	public ColorPane colorPane;
-	public JPanel colorPanel;
-	public JMenu conferenceMenu;
-	public JPanel confPanel;
-
-	public JPanel ctrlPanel;
-
-	public int currentSelectedShapeIndex;
-
-	public JToggleButton diamondButton;
-
-	public JToggleButton eraserButton;
-
-	// public JSlider eraserSlider;
-
-	public JButton fgButton;
-
-	public JFileChooser filechooser1, filechooser2;
-
-	public JMenu fileMenu;
-
-	public JPanel fontSettingsPane;
-
-	public JLabel labelCreateChannel;
-
-	public JLabel labelInputKey;
-
-	public JLabel labelJoinChannel;
-
-	public JLabel labelName;
-
-	public JLabel labelNickName;
-
-	public JLabel labelSetKey;
-
-	public JButton labelUpdateList;
-
-	public JToggleButton lineButton;
-
-	public JList listChannelList;
-	public JMenuBar mainMenu;
-
-	public JLabel mousePositionLabel, currentToolLabel;
-
-	public JToggleButton ovalButton;
-
-	public JToggleButton pencilButton;
-
 	public FileFilter pngFilter = new FileFilter() {
 		@Override
-		public boolean accept(java.io.File f) {
-			if (f.isDirectory())
+		public boolean accept(final java.io.File f) {
+			if (f.isDirectory()) {
 				return true;
-			if (f.getName().endsWith(".png"))
+			}
+			if (f.getName().endsWith(".png")) {
 				return true;
+			}
 			return false;
 		}
 
@@ -1435,23 +1432,18 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		}
 	};
 
-	public JToggleButton rectButton;
-
-	public JToggleButton roundrectButton;
-
-	public JScrollPane scrollPaneChannelList;
-
-	public JToggleButton seleButton;
-
-	public JComboBox shapesComboBox;
-
+	/**
+	 * FileFilter to check if the input file is the ShapeTalk format.
+	 */
 	public FileFilter shapeTalkDrawFilter = new FileFilter() {
 		@Override
-		public boolean accept(java.io.File f) {
-			if (f.isDirectory())
+		public boolean accept(final java.io.File f) {
+			if (f.isDirectory()) {
 				return true;
-			if (f.getName().endsWith(".jdw"))
+			}
+			if (f.getName().endsWith(".jdw")) {
 				return true;
+			}
 			return false;
 		}
 
@@ -1461,23 +1453,332 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		}
 	};
 
-	public JPanel statusBar;
-	public JTextField string2draw;
-	public JPanel strokeSettingsPane;
-	public JPanel strokeSettingsPanel;
-	public JToggleButton textButton;
-	public JTextField textFieldInputKey;
-	public JTextField textFieldNewChannelName;
-	public JTextField textFieldNickname;
-	public JTextField textFieldSetKey;
-	public JPanel toolButtonsPane;
-	public JPanel toolSettingsPane;
-	public ButtonGroup toolsGroup;
-	public JPanel toolsPanel;
-	public JComboBox weightCombo;
-	public JSlider weightSlider;
+	/**
+	 * Background frame. Top level component of the application.
+	 */
+	private JFrame bg_frame;
+	/**
+	 * OK button of the start conference panel.
+	 */
+	private JButton buttonOK;
+	/**
+	 * Container of the drawingBoard.
+	 */
+	private JScrollPane centerPane;
+	/**
+	 * "Change Font" button.
+	 */
+	private JButton changeFont;
+	/**
+	 * CheckBox to let the user define if the shapes are to filled.
+	 */
+	private JCheckBox checkBoxFill;
+	/**
+	 * "Clear all shapes" button.
+	 */
+	private JButton clearButton;
+	/**
+	 * ColorChooser instance.
+	 */
+	private JColorChooser colorChooser;
+	/**
+	 * ColorChooser Dialog.
+	 */
+	private JDialog colorChooserDialog;
+	/**
+	 * Container of color settings related objects.
+	 */
+	private ColorPane colorPane;
+	/**
+	 * Panel that hold the colorShow and "change color" buttons.
+	 */
+	private JPanel colorPanel;
+	/**
+	 * Left part of the color panel.
+	 */
+	private JPanel colorPanelLeft;
+	/**
+	 * Right part of the color panel.
+	 */
+	private JPanel colorPanelRight;
+	/**
+	 * "Conference" menu.
+	 */
+	private JMenu conferenceMenu;
+	/**
+	 * "Start new conference" panel.
+	 */
+	private JPanel confPanel;
+	/**
+	 * Container of the controllers.
+	 */
+	private JPanel ctrlPanel;
+	/**
+	 * Index of the current selected shape.
+	 * 
+	 * @see ShapeTalk.DrawingBoard#shapes
+	 */
+	private int currentSelectedShapeIndex;
+	/**
+	 * DELETE button
+	 */
+	private JButton deleteShapeButton;
+	/**
+	 * DIAMOND tool button.
+	 */
+	private JToggleButton diamondButton;
+	/**
+	 * "Edit" menu.
+	 */
+	private JMenu editMenu;
+	/**
+	 * ERASER tool button.
+	 */
+	private JToggleButton eraserButton;
+	/**
+	 * Filechoosers used when save or open image.
+	 */
+	private JFileChooser filechooser1, filechooser2;
+	/**
+	 * "File" menu.
+	 */
+	private JMenu fileMenu;
+	/**
+	 * "Change fill color" button.
+	 */
+	private JButton fillColorButton;
+	/**
+	 * Font preview label.
+	 */
+	private JLabel fontPreview;
+	/**
+	 * Container of font settings components.
+	 */
+	private JPanel fontSettingsPane;
+	/**
+	 * "Help" menu item.
+	 */
+	private JMenu helpMenuItem;
+	/**
+	 * "Create new channel" label.
+	 */
+	private JLabel labelCreateChannel;
+	/**
+	 * "Input key" label.
+	 */
+	private JLabel labelInputKey;
+	/**
+	 * "Join channel" label.
+	 */
+	private JLabel labelJoinChannel;
+	/**
+	 * "Channel name" label.
+	 */
+	private JLabel labelName;
+	/**
+	 * "Input nickname" label.
+	 */
+	private JLabel labelNickName;
+	/**
+	 * "Set channel key" label.
+	 */
+	private JLabel labelSetKey;
+	/**
+	 * "Update channel list" button.
+	 */
+	private JButton labelUpdateList;
+	/**
+	 * LINE tool button.
+	 */
+	private JToggleButton lineButton;
+	/**
+	 * Channel list.s
+	 */
+	private JList listChannelList;
+	/**
+	 * Main menu bar.
+	 */
+	private JMenuBar mainMenu;
+	/**
+	 * margin from the application frame to screen borders.
+	 */
+	private int margin;
+	/**
+	 * Application message label.
+	 */
+	private JLabel messageLabel;
+	/**
+	 * Mouse cursor position label.
+	 */
+	private JLabel mousePositionLabel;
+	/**
+	 * "Open Image" menu item.
+	 */
+	private JMenuItem openImageMenuItem;
+	/**
+	 * OVAL tool button.
+	 */
+	private JToggleButton ovalButton;
+	/**
+	 * PENCIL tool button.
+	 */
+	private JToggleButton pencilButton;
+	/**
+	 * "Quit" menu item.
+	 */
+	private JMenuItem quitMenuItem;
+	/**
+	 * RECTANGLE tool button.
+	 */
+	private JToggleButton rectButton;
+	/**
+	 * "Redo" menu item.
+	 */
+	private JMenuItem redoMenuItem;
+	/**
+	 * ROTATE button.
+	 */
+	private JButton rotateButton;
+	/**
+	 * ROUND_RECTANGLE tool button.
+	 */
+	private JToggleButton roundrectButton;
+	/**
+	 * "Save as PNG" menu item.
+	 */
+	private JMenuItem saveAsPNGMenuItem;
+	/**
+	 * "Save Image" menu item.
+	 */
+	private JMenuItem saveImageMenuItem;
+	/**
+	 * SCALE button.
+	 */
+	private JButton scaleButton;
+	/**
+	 * Dimension of the screen.
+	 */
+	private Dimension screen;
+	/**
+	 * Container of the channel list.
+	 */
+	private JScrollPane scrollPaneChannelList;
+	/**
+	 * SELECTION tool button.
+	 */
+	private JToggleButton seleButton;
+	/**
+	 * ComboBox which shows all the shapes on the drawingBoard.
+	 */
+	private JComboBox shapesComboBox;
+	/**
+	 * Container of the shape editing components.
+	 */
+	private JPanel shapesEditPane;
+	/**
+	 * Container of shape selection components.
+	 */
+	private JPanel shapesPane;
+
+	/**
+	 * SHEAR button.
+	 */
+	private JButton shearButton;
+
+	/**
+	 * "Start conference" menu item.
+	 */
+	private JMenuItem startConfMenuItem;
+
+	/**
+	 * Status bar.
+	 */
+	private JPanel statusBar;
+
+	/**
+	 * Text field to set the string that the TEXT tool draws.
+	 */
+	private JTextField string2draw;
+
+	/**
+	 * "Change stroke color" button.
+	 */
+	private JButton strokeColorButton;
+
+	/**
+	 * Container of the stroke settings component.
+	 */
+	private JPanel strokeSettingsPane;
+
+	/**
+	 * Container of the stroke slider.
+	 */
+	private JPanel strokeSettingsPanel;
+
+	/**
+	 * Temporary file that stores current shapes.
+	 * 
+	 * May be useful to "Crash Recovery" function.
+	 */
 	private File tempFile;
-	JCheckBox checkBoxFill;
-	JMenu editMenu;
-	JLabel fontPreview;
+
+	/**
+	 * TEXT tool button.
+	 */
+	private JToggleButton textButton;
+
+	/**
+	 * Text field to input join channel key.
+	 */
+	private JTextField textFieldInputKey;
+
+	/**
+	 * Text field to input new channel name.
+	 */
+	private JTextField textFieldNewChannelName;
+
+	/**
+	 * Text field to input nickname.
+	 */
+	private JTextField textFieldNickname;
+
+	/**
+	 * Text field to input new channel key.
+	 */
+	private JTextField textFieldSetKey;
+
+	/**
+	 * Container of the tool buttons.
+	 */
+	private JPanel toolButtonsPane;
+
+	/**
+	 * Container of the tool settings components.
+	 */
+	private JPanel toolSettingsPane;
+
+	/**
+	 * Button group of the toggle tool buttons.
+	 */
+	private ButtonGroup toolsGroup;
+
+	/**
+	 * Container of all the tool-related components.
+	 */
+	private JPanel toolsPanel;
+
+	/**
+	 * "Undo" menu item.
+	 */
+	private JMenuItem undoMenuItem;
+
+	/**
+	 * "View Doc" menu item.
+	 */
+	private JMenuItem viewDocMenuItem;
+
+	/**
+	 * Slider to set stroke index.
+	 */
+	private JSlider weightSlider;
 }

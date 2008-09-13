@@ -3,16 +3,24 @@ package ShapeTalk.DrawingBoard;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.Stroke;
 import java.awt.event.MouseEvent;
 
+/**
+ * FreeShape.java
+ * 
+ * Parent of PolyLine and Eraser.
+ * 
+ * @author Q
+ * 
+ */
 public abstract class FreeShape implements IShape {
 
 	protected FreeShape() {
 		pointsSet = new PointsSet(50);
 	}
 
-	protected FreeShape(Color c, BasicStroke s, int x, int y) {
+	protected FreeShape(final Color c, final BasicStroke s, final int x,
+			final int y) {
 		this();
 		color = c;
 		stroke = s;
@@ -24,16 +32,11 @@ public abstract class FreeShape implements IShape {
 	 * put in the implementation of PolyLine instead of here. However,
 	 * considering further extension by adding subclasses to the FreeShape
 	 * class, i choose to put it here.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#getShapeData()
 	 */
 	public String getShapeData() {
-//		int si = 0;
-//		for (int i = 0; i < DrawingBoard.ERASER_STROKES.length; i++) {
-//			if (stroke == DrawingBoard.ERASER_STROKES[i]) {
-//				si = i;
-//				break;
-//			}
-//		}
-		float si=stroke.getLineWidth();
+		final float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
@@ -48,10 +51,14 @@ public abstract class FreeShape implements IShape {
 		return buffer.toString();
 	}
 
+	/**
+	 * Get the most south-east point.
+	 */
 	public Point getSouthEastMostPoint() {
 		final int[][] points = pointsSet.getPoints();
-		if (points == null)
+		if (points == null) {
 			return new Point(0, 0);
+		}
 		int mx = 0, my = 0;
 		for (int i = 0; i < points[0].length; i++) {
 			if (points[0][i] > mx) {
@@ -64,9 +71,18 @@ public abstract class FreeShape implements IShape {
 		return new Point(mx, my);
 	}
 
-	public void processCursorEvent(MouseEvent e, int t) {
-		if (t != IShape.CURSOR_DRAGGED)
+	/**
+	 * Add point to pointSets.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#processCursorEvent(java.awt.event.MouseEvent,
+	 *      int)
+	 * 
+	 * @see ShapeTalk.DrawingBoard.FreeShape#pointsSet
+	 */
+	public void processCursorEvent(final MouseEvent e, final int t) {
+		if (t != IShape.CURSOR_DRAGGED) {
 			return;
+		}
 		pointsSet.addPoint(e.getX(), e.getY());
 	}
 
@@ -75,8 +91,10 @@ public abstract class FreeShape implements IShape {
 	 * put in the implementation of PolyLine instead of here. However,
 	 * considering further extension by adding subclasses to the FreeShape
 	 * class, i choose to put it here.
+	 * 
+	 * @see ShapeTalk.DrawingBoard.IShape#setShapeData(java.lang.String)
 	 */
-	public void setShapeData(String data) throws Exception {
+	public void setShapeData(final String data) throws Exception {
 		final String splits[] = data.split(":");
 		color = new Color(Integer.parseInt(splits[0]));
 		stroke = new BasicStroke(Float.parseFloat(splits[1]));
@@ -86,10 +104,19 @@ public abstract class FreeShape implements IShape {
 		}
 	}
 
+	/**
+	 * Color of the free shape.
+	 */
 	protected Color color;
 
+	/**
+	 * A set of points that constructs the shape.
+	 */
 	protected PointsSet pointsSet;
 
+	/**
+	 * Stroke of the shape.
+	 */
 	protected BasicStroke stroke;
 
 }
