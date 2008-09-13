@@ -257,6 +257,7 @@ public class DrawingBoard extends JPanel implements MouseListener,
 	private IShape currentShape;
 
 	public static ArrayList shapes;
+	public static ArrayList redos = new ArrayList(50);
 
 	private static int strokeIndex, eraserIndex;
 

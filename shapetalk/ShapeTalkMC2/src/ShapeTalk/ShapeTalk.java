@@ -333,7 +333,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				final JMenuItem undoMenuItem = new JMenuItem();
 				undoMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
-						// undoMenuItemActionPerformed();
+						undoMenuItemActionPerformed();
 					}
 				});
 				undoMenuItem.setText("Undo");
@@ -342,7 +342,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				final JMenuItem redoMenuItem = new JMenuItem();
 				redoMenuItem.addActionListener(new ActionListener() {
 					public void actionPerformed(final ActionEvent e) {
-						// redoMenuItemActionPerformed();
+						redoMenuItemActionPerformed();
 					}
 				});
 				redoMenuItem.setText("Redo");
@@ -375,6 +375,24 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				aboutMenuItem.setText("About");
 				helpMenuItem.add(aboutMenuItem);
 			}
+		}
+	}
+
+	public void undoMenuItemActionPerformed() {
+		if (drawingBoard.shapes.size() > 0) {
+			drawingBoard.redos.add(drawingBoard.shapes.get(drawingBoard.shapes
+					.size() - 1));
+			drawingBoard.shapes.remove(drawingBoard.shapes.size() - 1);
+			drawingBoard.repaint();
+		}
+	}
+
+	public void redoMenuItemActionPerformed() {
+		if (drawingBoard.redos.size() > 0) {
+			drawingBoard.shapes.add(drawingBoard.shapes.get(drawingBoard.redos
+					.size() - 1));
+			drawingBoard.redos.remove(drawingBoard.redos.size() - 1);
+			drawingBoard.repaint();
 		}
 	}
 
