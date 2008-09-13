@@ -30,7 +30,8 @@ public class AboutDialog extends JDialog {
 			System.out.println(url);
 			docEditorPane.setEditable(false);
 
-			docEditorPane.setPage(url);
+			docEditorPane
+					.setPage(new URL("http://code.google.com/p/shapetalk/"));
 			getContentPane().add(docEditorPane, BorderLayout.CENTER);
 			this.show();
 		} catch (final MalformedURLException e) {

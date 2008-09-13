@@ -426,6 +426,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		toolButtonsPane.setLayout(new GridLayout(5, 2, 5, 5));
 
 		seleButton = new JToggleButton();
+		seleButton.setEnabled(false);
 		toolsGroup.add(seleButton);
 		seleButton.setFont(new Font("Dialog", 0, 10));
 		seleButton.setSelected(true);
