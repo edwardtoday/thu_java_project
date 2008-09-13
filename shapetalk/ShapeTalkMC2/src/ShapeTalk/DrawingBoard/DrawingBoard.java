@@ -15,6 +15,8 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import ShapeTalk.ShapeTalk;
+
 public class DrawingBoard extends JPanel implements MouseListener,
 		MouseMotionListener {
 
@@ -53,6 +55,7 @@ public class DrawingBoard extends JPanel implements MouseListener,
 	}
 
 	public void clearBoard() {
+		System.out.print(shapes.get(0));
 		shapes.clear();
 		repaint();
 	}
@@ -253,7 +256,7 @@ public class DrawingBoard extends JPanel implements MouseListener,
 
 	private IShape currentShape;
 
-	public ArrayList shapes;
+	public static ArrayList shapes;
 
 	private static int strokeIndex, eraserIndex;
 
