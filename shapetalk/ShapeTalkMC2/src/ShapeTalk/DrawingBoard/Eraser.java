@@ -13,7 +13,7 @@ public class Eraser extends FreeShape {
 		this.board = board;
 	}
 
-	public Eraser(JComponent board, Stroke s, int x, int y) {
+	public Eraser(JComponent board, BasicStroke s, int x, int y) {
 		super(null, s, x, y);
 		this.board = board;
 	}
@@ -38,14 +38,14 @@ public class Eraser extends FreeShape {
 
 	@Override
 	public String getShapeData() {
-		int si = 0;
-		for (int i = 0; i < DrawingBoard.ERASER_STROKES.length; i++) {
-			if (stroke == DrawingBoard.ERASER_STROKES[i]) {
-				si = i;
-				break;
-			}
-		}
-		// float si = stroke.getLineWidth();
+		// int si = 0;
+		// for (int i = 0; i < DrawingBoard.ERASER_STROKES.length; i++) {
+		// if (stroke == DrawingBoard.ERASER_STROKES[i]) {
+		// si = i;
+		// break;
+		// }
+		// }
+		float si = stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(si);
 		final int[][] ps = pointsSet.getPoints();

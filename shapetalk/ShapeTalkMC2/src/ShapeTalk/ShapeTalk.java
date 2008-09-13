@@ -418,8 +418,6 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		strokeSettingsPane = new JPanel();
 		// weightCombo = new JComboBox();
 		weightSlider = new JSlider(1, 30, 2);
-
-		eraserCombo = new JComboBox();
 		toolsPanel = new JPanel();
 		toolButtonsPane = new JPanel();
 		toolsPanel.setBorder(new TitledBorder("Tools"));
@@ -650,17 +648,6 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			//
 			// strokeSettingsPane.add(weightCombo, BorderLayout.NORTH);
 
-			eraserCombo.setFont(new Font("Dialog", 0, 10));
-			eraserCombo.setModel(new DefaultComboBoxModel(new String[] {
-					"Eraser Size 15px", "Eraser Size 20px", "Eraser Size 30px",
-					"Eraser Size 50px", "Eraser Size 100px" }));
-			eraserCombo.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evt) {
-					eraserComboActionPerformed(evt);
-				}
-			});
-			strokeSettingsPane.add(eraserCombo, BorderLayout.SOUTH);
-
 			strokeSettingsPanel.add(strokeSettingsPane);
 
 			toolSettingsPane.add(strokeSettingsPanel);
@@ -764,13 +751,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		ShapeTalk.drawingBoard.setTool(DrawingBoard.TOOL_ERASER);
 	}// GEN-LAST:event_eraserButtonActionPerformed
 
-	public void eraserComboActionPerformed(ActionEvent evt) {// GEN
-		// -
-		// FIRST
-		// :
-		// event_eraserComboActionPerformed
-		ShapeTalk.drawingBoard.setEraserIndex(eraserCombo.getSelectedIndex());
-	}// GEN-LAST:event_eraserComboActionPerformed
+	// GEN-LAST:event_eraserComboActionPerformed
 
 	public void fgButtonActionPerformed(ActionEvent evt) {// GEN-
 		// FIRST
@@ -952,7 +933,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			bgButton.setBackground(bgcolor);
 			// weightCombo.setSelectedIndex(Integer.parseInt(br.readLine()));
 			weightSlider.setValue(Integer.parseInt(br.readLine()));
-			eraserCombo.setSelectedIndex(Integer.parseInt(br.readLine()));
+			weightSlider.setValue(Integer.parseInt(br.readLine()));
 			// eraserSlider.setValue(Integer.parseInt(br.readLine()));
 			final ArrayList list = new ArrayList();
 			String str;
@@ -1144,7 +1125,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			pw.println(bgcolor.getRGB());
 			// pw.println(weightCombo.getSelectedIndex());
 			pw.println(weightSlider.getValue());
-			pw.print(eraserCombo.getSelectedIndex());
+			pw.print(weightSlider.getValue());
 			// pw.println(eraserSlider.getValue());
 			pw.print(ShapeTalk.drawingBoard.getShapes());
 			pw.close();
@@ -1224,7 +1205,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			pw.println(fgcolor.getRGB());
 			pw.println(bgcolor.getRGB());
 			pw.println(weightSlider.getValue());
-			pw.print(eraserCombo.getSelectedIndex());
+			pw.print(weightSlider.getValue());
 			pw.print(ShapeTalk.drawingBoard.getShapes());
 			pw.close();
 		} catch (final java.io.IOException ioe) {
@@ -1403,7 +1384,6 @@ public class ShapeTalk implements WindowListener, MouseListener,
 
 	public JToggleButton eraserButton;
 
-	public JComboBox eraserCombo;
 	// public JSlider eraserSlider;
 
 	public JButton fgButton;

@@ -12,7 +12,7 @@ public abstract class FreeShape implements IShape {
 		pointsSet = new PointsSet(50);
 	}
 
-	protected FreeShape(Color c, Stroke s, int x, int y) {
+	protected FreeShape(Color c, BasicStroke s, int x, int y) {
 		this();
 		color = c;
 		stroke = s;
@@ -26,14 +26,14 @@ public abstract class FreeShape implements IShape {
 	 * class, i choose to put it here.
 	 */
 	public String getShapeData() {
-		int si = 0;
-		for (int i = 0; i < DrawingBoard.ERASER_STROKES.length; i++) {
-			if (stroke == DrawingBoard.ERASER_STROKES[i]) {
-				si = i;
-				break;
-			}
-		}
-		// float si=stroke.getLineWidth();
+//		int si = 0;
+//		for (int i = 0; i < DrawingBoard.ERASER_STROKES.length; i++) {
+//			if (stroke == DrawingBoard.ERASER_STROKES[i]) {
+//				si = i;
+//				break;
+//			}
+//		}
+		float si=stroke.getLineWidth();
 		final StringBuffer buffer = new StringBuffer();
 		buffer.append(color.getRGB());
 		buffer.append(":");
@@ -90,6 +90,6 @@ public abstract class FreeShape implements IShape {
 
 	protected PointsSet pointsSet;
 
-	protected Stroke stroke;
+	protected BasicStroke stroke;
 
 }

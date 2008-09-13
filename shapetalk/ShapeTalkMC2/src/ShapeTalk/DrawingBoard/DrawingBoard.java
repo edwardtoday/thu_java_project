@@ -151,9 +151,8 @@ public class DrawingBoard extends JPanel implements MouseListener,
 						DrawingBoard.strokeIndex), e.getX(), e.getY());
 				break;
 			case TOOL_ERASER:
-				currentShape = new Eraser(this,
-						DrawingBoard.ERASER_STROKES[DrawingBoard.eraserIndex],
-						e.getX(), e.getY());
+				currentShape = new Eraser(this, new BasicStroke(
+						DrawingBoard.strokeIndex), e.getX(), e.getY());
 				break;
 			case TOOL_TEXT:
 				currentShape = new Text(DrawingBoard.string2draw,
