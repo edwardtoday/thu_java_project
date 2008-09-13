@@ -247,9 +247,13 @@ public class DrawingBoard extends JPanel implements MouseListener,
 			fillColor = c;
 	}
 
+	public void setString(String s) {
+		string2draw = s;
+	}
+
 	private IShape currentShape;
 
-	private ArrayList shapes;
+	public ArrayList shapes;
 
 	private static int strokeIndex, eraserIndex;
 

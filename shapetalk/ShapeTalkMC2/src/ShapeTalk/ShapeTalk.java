@@ -186,7 +186,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		Font font = drawingBoard.getFont();
 		font = NwFontChooserS.showDialog(bg_frame, null, font);
 		drawingBoard.setFont(font);
-
+		string2draw.setFont(font);
 	}
 
 	public void clearButtonActionPerformed(ActionEvent evt) {// GEN
@@ -253,6 +253,8 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		create_drawingboard();
 	}
 
+	JMenu editMenu;
+
 	public void createMenu() {
 		mainMenu = new JMenuBar();
 		bg_frame.setJMenuBar(mainMenu);
@@ -301,6 +303,31 @@ public class ShapeTalk implements WindowListener, MouseListener,
 				});
 				quitMenuItem.setText("Quit");
 				fileMenu.add(quitMenuItem);
+			}
+			// Edit
+			editMenu = new JMenu();
+			editMenu.setActionCommand("Edit");
+			editMenu.setText("Menu");
+			mainMenu.add(editMenu);
+			{
+				// Undo
+				final JMenuItem undoMenuItem = new JMenuItem();
+				undoMenuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(final ActionEvent e) {
+						// undoMenuItemActionPerformed();
+					}
+				});
+				undoMenuItem.setText("Undo");
+				editMenu.add(undoMenuItem);
+				// Redo
+				final JMenuItem redoMenuItem = new JMenuItem();
+				redoMenuItem.addActionListener(new ActionListener() {
+					public void actionPerformed(final ActionEvent e) {
+						// redoMenuItemActionPerformed();
+					}
+				});
+				redoMenuItem.setText("Redo");
+				editMenu.add(redoMenuItem);
 			}
 			// Conference
 			conferenceMenu = new JMenu();
@@ -376,6 +403,7 @@ public class ShapeTalk implements WindowListener, MouseListener,
 		eraserCombo = new JComboBox();
 		// eraserSlider = new JSlider(0, 100, 0);
 		fontSettingsPane = new JPanel();
+		fontSettingsPane.setLayout(new BorderLayout());
 
 		ctrlPanel.setLayout(new GridBagLayout());
 
@@ -629,15 +657,25 @@ public class ShapeTalk implements WindowListener, MouseListener,
 			});
 
 			changeFont.setText("Change Font");
-			fontSettingsPane.add(changeFont);
+			fontSettingsPane.add(changeFont, BorderLayout.NORTH);
 
+			string2draw = new JTextField("set your own string");
+			string2draw.addActionListener(new ActionListener() {
+				public void actionPerformed(final ActionEvent e) {
+					string2drawChanged(e);
+				}
+			});
+			fontSettingsPane.add(string2draw, BorderLayout.SOUTH);
 		}
-
 		final GridBagConstraints gridBagConstraints = new GridBagConstraints();
 		gridBagConstraints.anchor = GridBagConstraints.NORTH;
 		gridBagConstraints.weightx = 1.0;
 		gridBagConstraints.insets = new Insets(10, 5, 5, 5);
 		ctrlPanel.add(toolSettingsPane, gridBagConstraints);
+	}
+
+	public void string2drawChanged(ActionEvent e) {
+		drawingBoard.setString(string2draw.getText());
 	}
 
 	JCheckBox checkBoxFill;
@@ -1266,32 +1304,20 @@ public class ShapeTalk implements WindowListener, MouseListener,
 	};
 
 	public JPanel statusBar;
-
+	public JTextField string2draw;
 	public JPanel strokeSettingsPane;
-
 	public JPanel strokeSettingsPanel;
-
 	public JToggleButton textButton;
-
 	public JTextField textFieldInputKey;
-
 	public JTextField textFieldNewChannelName;
-
 	public JTextField textFieldNickname;
-
 	public JTextField textFieldSetKey;
-
 	public JPanel toolButtonsPane;
-
 	public JPanel toolSettingsPane;
-
 	public ButtonGroup toolsGroup;
-
 	public JPanel toolsPanel;
-
 	public JComboBox weightCombo;
 	public JSlider weightSlider;
-
 	private JToggleButton roundrectButton;
 	JLabel fontPreview;
 }
